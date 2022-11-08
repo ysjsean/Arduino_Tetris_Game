@@ -18,6 +18,7 @@
 #define BUTTON_RIGHT A4
 #define BUTTON_ROTATE A5
 #define BUTTON_SPEEDUP A2
+#define BUTTON_START A1
 
 Adafruit_NeoPixel col1(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel col2(NUMPIXELS, PIN2, NEO_GRB + NEO_KHZ800);
@@ -54,6 +55,7 @@ int currentStateL;
 int currentStateR; // the current reading from the input pin
 int currentRotateState;
 int SpeedUp;
+int currentStateStart;
 // bool lightArray[38][10];//record the light pixel
 int lightArray[38][10]; // record the light pixel
 bool currentLanded = true;
@@ -136,14 +138,19 @@ void randomShape(int currentShape)
         {
         case 0:
             shapeO();
+            break;
         case 1:
             shapeZ();
+            break;
         case 2:
             shapeL();
+            break;
         case 3:
             shapeT();
+            break;
         case 4:
             shapeI();
+            break;
         }
     }
     else
@@ -213,6 +220,80 @@ void endGame()
     }
     while (1)
     {
+        currentStateStart = digitalRead(BUTTON_START);
+        if (currentStateStart == HIGH)
+        {
+            for (int i = 0; i < 38; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    switch (17 - j)
+                    {
+                    case PIN:
+                        col1.setPixelColor(i, col1.Color(0, 0, 0));
+                        break;
+                    case PIN2:
+                        col2.setPixelColor(i, col2.Color(0, 0, 0));
+                        break;
+                    case PIN3:
+                        col3.setPixelColor(i, col3.Color(0, 0, 0));
+                        break;
+                    case PIN4:
+                        col4.setPixelColor(i, col4.Color(0, 0, 0));
+                        break;
+                    case PINL1:
+                        colL1.setPixelColor(i, colL1.Color(0, 0, 0));
+                        break;
+                    case PINL2:
+                        colL2.setPixelColor(i, colL2.Color(0, 0, 0));
+                        break;
+                    case PINL3:
+                        colL3.setPixelColor(i, colL3.Color(0, 0, 0));
+                        break;
+                    case PINR1:
+                        colR1.setPixelColor(i, colR1.Color(0, 0, 0));
+                        break;
+                    case PINR2:
+                        colR2.setPixelColor(i, colR2.Color(0, 0, 0));
+                        break;
+                    case PINR3:
+                        colR3.setPixelColor(i, colR3.Color(0, 0, 0));
+                        break;
+                    }
+                }
+            }
+            showCol();
+
+            Serial.begin(9600);
+            pinMode(BUTTON_LEFT, INPUT);
+            pinMode(BUTTON_RIGHT, INPUT);
+            pinMode(BUTTON_ROTATE, INPUT);
+            pinMode(BUTTON_SPEEDUP, INPUT);
+            pinMode(BUTTON_START, INPUT);
+            randomSeed(analogRead(0));
+            randNumber = random(0, 5);
+
+            for (int i = 0; i < 38; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    lightArray[i][j] = 0;
+                }
+            }
+            score == 0;
+            randomShape(randNumber);
+            col1.begin();
+            col2.begin();
+            col3.begin();
+            col4.begin();
+            colL1.begin();
+            colL2.begin();
+            colL3.begin();
+            colR1.begin();
+            colR2.begin();
+            colR3.begin();
+            break;
+        }
     }
 }
 
