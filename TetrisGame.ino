@@ -1,4 +1,9 @@
 #include <Adafruit_NeoPixel.h>
+#include <SD.h>
+#include <SPI.h>
+#include <TMRpcm.h>
+#include <Beacon.h>
+
 #ifdef __AVR__
 #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
@@ -20,6 +25,8 @@
 #define BUTTON_SPEEDUP A2
 #define BUTTON_START A1
 #define BUTTON_DROP A8
+
+#define SD_ChipSelectPin 53 // example uses hardware SS pin 53 on Mega2560
 
 Adafruit_NeoPixel col1(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel col2(NUMPIXELS, PIN2, NEO_GRB + NEO_KHZ800);
@@ -93,7 +100,20 @@ const int numbers[10][7] =
         {1, 0, 0, 0, 0, 0, 0}, // 9
 };
 int incomingByte = 0;
-int counter = 0;
+
+TMRpcm audio; // create an object for use in this sketch
+
+enum State
+{
+    game_over,
+    add_point,
+    background,
+    stop_sound,
+    increase,
+    decrease,
+    stop_all,
+    default_null
+} audio_state;
 
 void setup()
 {
@@ -122,6 +142,25 @@ void setup()
         pinMode(tens_highscore_pin[x], OUTPUT);
     }
 
+    audio.speakerPin = 5; // 5,6,11 or 46 on Mega, 9 on Uno, Nano, etc
+    pinMode(2, OUTPUT);   // Pin pairs: 9,10 Mega: 5-2,6-7,11-12,46-45
+
+    audio.speakerPin2 = 6; // Enable the second set of timer pins
+    pinMode(7, OUTPUT);
+
+    audio.setVolume(3);
+    audio.quality(1);
+
+    if (!SD.begin(SD_ChipSelectPin))
+    {
+        return;
+    }
+    else
+    {
+        Serial.println("SD OK");
+        audio_state = default_null;
+    }
+
     randomShape(randNumber);
     col1.begin();
     col2.begin();
@@ -137,6 +176,11 @@ void setup()
 
 void loop()
 {
+    if (!audio.isPlaying(0))
+    {
+        audio_state = background;
+    }
+    audioControl();
 
     col1.setBrightness(10);
     col2.setBrightness(10);
@@ -205,6 +249,10 @@ void randomShape(int currentShape)
 // all pixels set to white
 void endGame()
 {
+    audio_state = stop_all;
+    audioControl();
+    audio_state = game_over;
+    audioControl();
     for (int i = 0; i < 38; i++)
     {
         for (int j = 0; j < 10; j++)
@@ -1631,58 +1679,13 @@ void checkLine()
         {
             score += 1;
             arrayUpdate(i);
-            blink(i);
+            audio_state = add_point;
             i = i + 2;
         }
     }
     arrayLight();
 }
-void blink(int line)
-{
-    col1.setPixelColor(line, col1.Color(0, 0, 0));
-    col2.setPixelColor(line, col1.Color(0, 0, 0));
-    col3.setPixelColor(line, col1.Color(0, 0, 0));
-    col4.setPixelColor(line, col1.Color(0, 0, 0));
-    colL1.setPixelColor(line, col1.Color(0, 0, 0));
-    colL2.setPixelColor(line, col1.Color(0, 0, 0));
-    colL3.setPixelColor(line, col1.Color(0, 0, 0));
-    colR1.setPixelColor(line, col1.Color(0, 0, 0));
-    colR2.setPixelColor(line, col1.Color(0, 0, 0));
-    colR3.setPixelColor(line, col1.Color(0, 0, 0));
-    delay(50);
-    col1.setPixelColor(line, col1.Color(255, 255, 255));
-    col2.setPixelColor(line, col1.Color(255, 255, 255));
-    col3.setPixelColor(line, col1.Color(255, 255, 255));
-    col4.setPixelColor(line, col1.Color(255, 255, 255));
-    colL1.setPixelColor(line, col1.Color(255, 255, 255));
-    colL2.setPixelColor(line, col1.Color(255, 255, 255));
-    colL3.setPixelColor(line, col1.Color(255, 255, 255));
-    colR1.setPixelColor(line, col1.Color(255, 255, 255));
-    colR2.setPixelColor(line, col1.Color(255, 255, 255));
-    colR3.setPixelColor(line, col1.Color(255, 255, 255));
-    delay(50);
-    col1.setPixelColor(line, col1.Color(0, 0, 0));
-    col2.setPixelColor(line, col1.Color(0, 0, 0));
-    col3.setPixelColor(line, col1.Color(0, 0, 0));
-    col4.setPixelColor(line, col1.Color(0, 0, 0));
-    colL1.setPixelColor(line, col1.Color(0, 0, 0));
-    colL2.setPixelColor(line, col1.Color(0, 0, 0));
-    colL3.setPixelColor(line, col1.Color(0, 0, 0));
-    colR1.setPixelColor(line, col1.Color(0, 0, 0));
-    colR2.setPixelColor(line, col1.Color(0, 0, 0));
-    colR3.setPixelColor(line, col1.Color(0, 0, 0));
-    delay(50);
-    col1.setPixelColor(line, col1.Color(255, 255, 255));
-    col2.setPixelColor(line, col1.Color(255, 255, 255));
-    col3.setPixelColor(line, col1.Color(255, 255, 255));
-    col4.setPixelColor(line, col1.Color(255, 255, 255));
-    colL1.setPixelColor(line, col1.Color(255, 255, 255));
-    colL2.setPixelColor(line, col1.Color(255, 255, 255));
-    colL3.setPixelColor(line, col1.Color(255, 255, 255));
-    colR1.setPixelColor(line, col1.Color(255, 255, 255));
-    colR2.setPixelColor(line, col1.Color(255, 255, 255));
-    colR3.setPixelColor(line, col1.Color(255, 255, 255));
-}
+
 void arrayUpdate(int line)
 {
 
@@ -3763,4 +3766,35 @@ void displayHighscore(int score)
         digitalWrite(ones_highscore_pin[j], numbers[ones][j]);
         digitalWrite(tens_highscore_pin[j], numbers[tens][j]);
     }
+}
+
+void audioControl()
+{
+    switch (audio_state)
+    {
+    case add_point:
+        audio.play("point2.wav", 1);
+        break; // Play point sound on pins 5,2
+    case game_over:
+        audio.play("go3.wav", 1);
+        break; // Play gameover sound on pins 5,2
+    case background:
+        audio.play("tetris1.wav", 0);
+        break; // Play background music on pins 6,7
+    case increase:
+        audio.volume(1);
+        break; // Increase volume by 1
+    case decrease:
+        audio.volume(0);
+        break; // Decrease volume by 1
+    case stop_sound:
+        audio.stopPlayback(1);
+        break; // Stop playback on output 0
+    case stop_all:
+        audio.stopPlayback();
+        break; // Stop all playback
+    default:
+        break;
+    }
+    audio_state = default_null;
 }
