@@ -48,6 +48,7 @@ bool lightArray[20][10]; // record the light pixel
 bool currentLanded = true;
 long currentShape = -1;
 long randNumber = -1;
+int score = 0;
 
 void setup()
 {
@@ -95,39 +96,9 @@ void loop()
     // shapeI();
     randomShape(randNumber);
 }
-void randomShape(int currentShape)
+// show all col
+void showCol()
 {
-    switch (currentShape)
-    {
-    case 0:
-        shapeO();
-        break;
-    case 1:
-        shapeZ();
-        break;
-    case 2:
-        shapeL();
-        break;
-    case 3:
-        shapeT();
-        break;
-    case 4:
-        shapeI();
-        break;
-    default:
-        break;
-    }
-    currentLanded = false;
-}
-
-void shapeO()
-{
-    centery1b = centery1;
-    centery2b = centery2;
-    centery3b = centery3;
-    centery4b = centery4;
-    lightO(centerx);
-
     col1.show();
     col2.show();
     col3.show();
@@ -138,6 +109,131 @@ void shapeO()
     colR1.show();
     colR2.show();
     colR3.show();
+}
+
+void randomShape(int currentShape)
+{
+    switch (currentShape)
+    {
+    case 0:
+        if (lightArray[centerx][11 - centery2] + lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery2] + lightArray[centerx + 2][11 - centery3] == 0)
+        {
+            shapeO();
+        }
+        else
+        {
+            // Game Over;
+            endGame();
+        }
+        break;
+    case 1:
+        if (lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery3] + lightArray[centerx + 2][11 - centery2] + lightArray[centerx + 4][11 - centery2] == 0)
+        {
+            shapeZ();
+        }
+        else
+        {
+            // Game Over;
+            endGame();
+        }
+
+        break;
+    case 2:
+        if (lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery3] + lightArray[centerx + 4][11 - centery3] + lightArray[centerx + 4][11 - centery2] == 0)
+        {
+            shapeL();
+        }
+        else
+        {
+            // Game Over;
+            endGame();
+        }
+        break;
+    case 3:
+        if (lightArray[centerx + 2][11 - centery3] + lightArray[centerx][11 - centery2] + lightArray[centerx + 2][11 - centery2] + lightArray[centerx + 4][11 - centery2] == 0)
+        {
+            shapeT();
+        }
+        else
+        {
+            // Game Over;
+            endGame();
+        }
+        break;
+    case 4:
+        if (lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery3] + lightArray[centerx + 4][11 - centery3] + lightArray[centerx + 6][11 - centery3] == 0)
+        {
+            shapeI();
+        }
+        else
+        {
+            // Game Over;
+            endGame();
+        }
+        break;
+    default:
+        break;
+    }
+    currentLanded = false;
+}
+
+// Game Over function
+void endGame()
+{
+    for (int i = 0; i < 20; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            switch (11 - j)
+            {
+            case PIN:
+                col1.setPixelColor(i, col1.Color(255, 0, 255));
+                break;
+            case PIN2:
+                col2.setPixelColor(i, col2.Color(255, 0, 255));
+                break;
+            case PIN3:
+                col3.setPixelColor(i, col3.Color(255, 0, 255));
+                break;
+            case PIN4:
+                col4.setPixelColor(i, col4.Color(255, 0, 255));
+                break;
+            case PINL1:
+                colL1.setPixelColor(i, colL1.Color(255, 0, 255));
+                break;
+            case PINL2:
+                colL2.setPixelColor(i, colL2.Color(255, 0, 255));
+                break;
+            case PINL3:
+                colL3.setPixelColor(i, colL3.Color(255, 0, 255));
+                break;
+            case PINR1:
+                colR1.setPixelColor(i, colR1.Color(255, 0, 255));
+                break;
+            case PINR2:
+                colR2.setPixelColor(i, colR2.Color(255, 0, 255));
+                break;
+            case PINR3:
+                colR3.setPixelColor(i, colR3.Color(255, 0, 255));
+                break;
+            }
+        }
+    }
+    showCol();
+    while (1)
+    {
+    }
+}
+
+void shapeO()
+{
+    centery1b = centery1;
+    centery2b = centery2;
+    centery3b = centery3;
+    centery4b = centery4;
+    lightO(centerx);
+
+    showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
@@ -181,16 +277,7 @@ void shapeO()
         turnoffO(centerx);
 
         centerx = centerx + SPEED;
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
     }
     else
     {
@@ -206,16 +293,7 @@ void shapeO()
         centery3 = PIN3;
         centery4 = PIN4;
         checkLine();
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
         randNumber = random(0, 5);
     }
 }
@@ -229,16 +307,7 @@ void shapeL()
     centery4b = centery4;
     lightL(centerx);
 
-    col1.show();
-    col2.show();
-    col3.show();
-    col4.show();
-    colL1.show();
-    colL2.show();
-    colL3.show();
-    colR1.show();
-    colR2.show();
-    colR3.show();
+    showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
@@ -282,16 +351,7 @@ void shapeL()
         turnoffL(centerx);
 
         centerx = centerx + SPEED;
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
     }
     else
     {
@@ -307,16 +367,7 @@ void shapeL()
         centery3 = PIN3;
         centery4 = PIN4;
         checkLine();
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
         randNumber = random(0, 5);
     }
 }
@@ -330,16 +381,7 @@ void shapeZ()
     centery4b = centery4;
     lightZ(centerx);
 
-    col1.show();
-    col2.show();
-    col3.show();
-    col4.show();
-    colL1.show();
-    colL2.show();
-    colL3.show();
-    colR1.show();
-    colR2.show();
-    colR3.show();
+    showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
@@ -383,16 +425,7 @@ void shapeZ()
         turnoffZ(centerx);
 
         centerx = centerx + SPEED;
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
     }
     else
     {
@@ -408,16 +441,7 @@ void shapeZ()
         centery3 = PIN3;
         centery4 = PIN4;
         checkLine();
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
         randNumber = random(0, 5);
     }
 }
@@ -430,16 +454,7 @@ void shapeT()
     centery4b = centery4;
     lightT(centerx);
 
-    col1.show();
-    col2.show();
-    col3.show();
-    col4.show();
-    colL1.show();
-    colL2.show();
-    colL3.show();
-    colR1.show();
-    colR2.show();
-    colR3.show();
+    showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
@@ -472,16 +487,7 @@ void shapeT()
     {
         turnoffT(centerx);
         centerx = centerx + SPEED;
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
     }
     else
     {
@@ -495,16 +501,7 @@ void shapeT()
         centery3 = PIN3;
         centery4 = PIN4;
         checkLine();
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
         randNumber = random(0, 5);
     }
 }
@@ -518,16 +515,7 @@ void shapeI()
     centery4b = centery4;
     lightI(centerx);
 
-    col1.show();
-    col2.show();
-    col3.show();
-    col4.show();
-    colL1.show();
-    colL2.show();
-    colL3.show();
-    colR1.show();
-    colR2.show();
-    colR3.show();
+    showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
@@ -569,16 +557,7 @@ void shapeI()
         turnoffI(centerx);
 
         centerx = centerx + SPEED;
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
     }
     else
     {
@@ -594,16 +573,7 @@ void shapeI()
         centery3 = PIN3;
         centery4 = PIN4;
         checkLine();
-        col1.show();
-        col2.show();
-        col3.show();
-        col4.show();
-        colL1.show();
-        colL2.show();
-        colL3.show();
-        colR1.show();
-        colR2.show();
-        colR3.show();
+        showCol();
         randNumber = random(0, 5);
     }
 }
@@ -619,9 +589,10 @@ void checkLine()
         {
             product = product * lightArray[i][j];
         }
-        Serial.println(product);
+
         if (product != 0)
         {
+            score += 1;
             arrayUpdate(i);
             i = i + 2;
         }
