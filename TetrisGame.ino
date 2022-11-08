@@ -30,6 +30,11 @@ Adafruit_NeoPixel colL3(NUMPIXELS, PINL3, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel colR1(NUMPIXELS, PINR1, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel colR2(NUMPIXELS, PINR2, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel colR3(NUMPIXELS, PINR3, NEO_GRB + NEO_KHZ800);
+// L rgb(220,0,0) 1
+// I rgb(0,0,255) 2
+// O rgb(0,128,0) 3
+// Z rgb(255,255,0) 4
+// T rgb(255,0,255) 5
 
 #define DELAYVAL 500 // Time (in milliseconds) to pause between pixels
 int centerx = 0;
@@ -49,7 +54,8 @@ int currentStateL;
 int currentStateR; // the current reading from the input pin
 int currentRotateState;
 int SpeedUp;
-bool lightArray[38][10]; // record the light pixel
+// bool lightArray[38][10];//record the light pixel
+int lightArray[38][10]; // record the light pixel
 bool currentLanded = true;
 long currentShape = -1;
 long randNumber = -1;
@@ -73,7 +79,7 @@ void setup()
     {
         for (int j = 0; j < 10; j++)
         {
-            lightArray[i][j] = false;
+            lightArray[i][j] = 0;
         }
     }
 
@@ -127,68 +133,72 @@ void randomShape(int currentShape)
     switch (currentShape)
     {
     case 0:
-        if (lightArray[centerx][11 - centery2] + lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery2] + lightArray[centerx + 2][11 - centery3] == 0)
+        if (lightArray[centerx][11 - centery2] == 0 && lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery2] == 0 && lightArray[centerx + 2][11 - centery3] == 0)
         {
             shapeO();
         }
         else
         {
             // Game Over;
+            Serial.println("enter case0 else");
             endGame();
         }
         break;
     case 1:
-        if (lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery3] + lightArray[centerx + 2][11 - centery2] + lightArray[centerx + 4][11 - centery2] == 0)
+        if (lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery2] == 0 && lightArray[centerx + 4][11 - centery2] == 0)
         {
             shapeZ();
         }
         else
         {
             // Game Over;
+            Serial.println("enter case1 else");
             endGame();
         }
 
         break;
     case 2:
-        if (lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery3] + lightArray[centerx + 4][11 - centery3] + lightArray[centerx + 4][11 - centery2] == 0)
+        if (lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx + 4][11 - centery3] == 0 && lightArray[centerx + 4][11 - centery2] == 0)
         {
             shapeL();
         }
         else
         {
             // Game Over;
+            Serial.println("enter case2 else");
             endGame();
         }
         break;
     case 3:
-        if (lightArray[centerx + 2][11 - centery3] + lightArray[centerx][11 - centery2] + lightArray[centerx + 2][11 - centery2] + lightArray[centerx + 4][11 - centery2] == 0)
+        if (lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx][11 - centery2] == 0 && lightArray[centerx + 2][11 - centery2] == 0 && lightArray[centerx + 4][11 - centery2] == 0)
         {
             shapeT();
         }
         else
         {
             // Game Over;
+            Serial.println("enter case3 else");
             endGame();
         }
         break;
     case 4:
-        if (lightArray[centerx][11 - centery3] + lightArray[centerx + 2][11 - centery3] + lightArray[centerx + 4][11 - centery3] + lightArray[centerx + 6][11 - centery3] == 0)
+        if (lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx + 4][11 - centery3] == 0 && lightArray[centerx + 6][11 - centery3] == 0)
         {
             shapeI();
         }
         else
         {
             // Game Over;
+            Serial.println("enter case4 else");
             endGame();
         }
-        break;
-    default:
         break;
     }
     currentLanded = false;
 }
 
 // Game Over function
+// all pixels set to white
 void endGame()
 {
     for (int i = 0; i < 38; i++)
@@ -198,39 +208,46 @@ void endGame()
             switch (11 - j)
             {
             case PIN:
-                col1.setPixelColor(i, col1.Color(255, 0, 255));
+                col1.setPixelColor(i, col1.Color(255, 255, 255));
                 break;
             case PIN2:
-                col2.setPixelColor(i, col2.Color(255, 0, 255));
+                col2.setPixelColor(i, col2.Color(255, 255, 255));
                 break;
             case PIN3:
-                col3.setPixelColor(i, col3.Color(255, 0, 255));
+                col3.setPixelColor(i, col3.Color(255, 255, 255));
                 break;
             case PIN4:
-                col4.setPixelColor(i, col4.Color(255, 0, 255));
+                col4.setPixelColor(i, col4.Color(255, 255, 255));
                 break;
             case PINL1:
-                colL1.setPixelColor(i, colL1.Color(255, 0, 255));
+                colL1.setPixelColor(i, colL1.Color(255, 255, 255));
                 break;
             case PINL2:
-                colL2.setPixelColor(i, colL2.Color(255, 0, 255));
+                colL2.setPixelColor(i, colL2.Color(255, 255, 255));
                 break;
             case PINL3:
-                colL3.setPixelColor(i, colL3.Color(255, 0, 255));
+                colL3.setPixelColor(i, colL3.Color(255, 255, 255));
                 break;
             case PINR1:
-                colR1.setPixelColor(i, colR1.Color(255, 0, 255));
+                colR1.setPixelColor(i, colR1.Color(255, 255, 255));
                 break;
             case PINR2:
-                colR2.setPixelColor(i, colR2.Color(255, 0, 255));
+                colR2.setPixelColor(i, colR2.Color(255, 255, 255));
                 break;
             case PINR3:
-                colR3.setPixelColor(i, colR3.Color(255, 0, 255));
+                colR3.setPixelColor(i, colR3.Color(255, 255, 255));
                 break;
             }
         }
     }
     showCol();
+    for (int i = 0; i < 38; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            lightArray[i][j] = 0;
+        }
+    }
     if (highestScore <= score)
     {
         highestScore = score;
@@ -305,10 +322,10 @@ void shapeO()
     else
     {
 
-        lightArray[centerx][11 - centery2] = true;
-        lightArray[centerx + 2][11 - centery2] = true;
-        lightArray[centerx][11 - centery3] = true;
-        lightArray[centerx + 2][11 - centery3] = true;
+        lightArray[centerx][11 - centery2] = 3;
+        lightArray[centerx + 2][11 - centery2] = 3;
+        lightArray[centerx][11 - centery3] = 3;
+        lightArray[centerx + 2][11 - centery3] = 3;
 
         centerx = 0;
         centery1 = PIN;
@@ -529,10 +546,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = true;
-            lightArray[centerx + 2][11 - centery3] = true;
-            lightArray[centerx + 4][11 - centery3] = true;
-            lightArray[centerx + 4][11 - centery2] = true;
+            lightArray[centerx][11 - centery3] = 1;
+            lightArray[centerx + 2][11 - centery3] = 1;
+            lightArray[centerx + 4][11 - centery3] = 1;
+            lightArray[centerx + 4][11 - centery2] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -556,10 +573,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery1] = true;
-            lightArray[centerx][11 - centery2] = true;
-            lightArray[centerx][11 - centery3] = true;
-            lightArray[centerx + 2][11 - centery3] = true;
+            lightArray[centerx][11 - centery1] = 1;
+            lightArray[centerx][11 - centery2] = 1;
+            lightArray[centerx][11 - centery3] = 1;
+            lightArray[centerx + 2][11 - centery3] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -582,10 +599,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = true;
-            lightArray[centerx][11 - centery2] = true;
-            lightArray[centerx + 2][11 - centery2] = true;
-            lightArray[centerx + 4][11 - centery2] = true;
+            lightArray[centerx][11 - centery3] = 1;
+            lightArray[centerx][11 - centery2] = 1;
+            lightArray[centerx + 2][11 - centery2] = 1;
+            lightArray[centerx + 4][11 - centery2] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -608,10 +625,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery1] = true;
-            lightArray[centerx + 2][11 - centery1] = true;
-            lightArray[centerx + 2][11 - centery2] = true;
-            lightArray[centerx + 2][11 - centery3] = true;
+            lightArray[centerx][11 - centery1] = 1;
+            lightArray[centerx + 2][11 - centery1] = 1;
+            lightArray[centerx + 2][11 - centery2] = 1;
+            lightArray[centerx + 2][11 - centery3] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -747,10 +764,10 @@ void shapeZ()
         else
         {
 
-            lightArray[centerx + 2][11 - centery2] = true;
-            lightArray[centerx + 4][11 - centery2] = true;
-            lightArray[centerx][11 - centery3] = true;
-            lightArray[centerx + 2][11 - centery3] = true;
+            lightArray[centerx + 2][11 - centery2] = 4;
+            lightArray[centerx + 4][11 - centery2] = 4;
+            lightArray[centerx][11 - centery3] = 4;
+            lightArray[centerx + 2][11 - centery3] = 4;
 
             centerx = 0;
             centery1 = PIN;
@@ -776,10 +793,10 @@ void shapeZ()
         else
         {
 
-            lightArray[centerx + 2][11 - centery3] = true;
-            lightArray[centerx][11 - centery2] = true;
-            lightArray[centerx + 2][11 - centery2] = true;
-            lightArray[centerx][11 - centery1] = true;
+            lightArray[centerx + 2][11 - centery3] = 4;
+            lightArray[centerx][11 - centery2] = 4;
+            lightArray[centerx + 2][11 - centery2] = 4;
+            lightArray[centerx][11 - centery1] = 4;
 
             centerx = 0;
             centery1 = PIN;
@@ -964,10 +981,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery2] = 1;
-            lightArray[centerx + 2][11 - centery2] = 1;
-            lightArray[centerx + 4][11 - centery2] = 1;
-            lightArray[centerx + 2][11 - centery3] = 1;
+            lightArray[centerx][11 - centery2] = 5;
+            lightArray[centerx + 2][11 - centery2] = 5;
+            lightArray[centerx + 4][11 - centery2] = 5;
+            lightArray[centerx + 2][11 - centery3] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -989,10 +1006,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = 1;
-            lightArray[centerx + 2][11 - centery2] = 1;
-            lightArray[centerx + 2][11 - centery3] = 1;
-            lightArray[centerx + 2][11 - centery4] = 1;
+            lightArray[centerx][11 - centery3] = 5;
+            lightArray[centerx + 2][11 - centery2] = 5;
+            lightArray[centerx + 2][11 - centery3] = 5;
+            lightArray[centerx + 2][11 - centery4] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -1014,10 +1031,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = 1;
-            lightArray[centerx + 2][11 - centery3] = 1;
-            lightArray[centerx + 4][11 - centery3] = 1;
-            lightArray[centerx + 2][11 - centery2] = 1;
+            lightArray[centerx][11 - centery3] = 5;
+            lightArray[centerx + 2][11 - centery3] = 5;
+            lightArray[centerx + 4][11 - centery3] = 5;
+            lightArray[centerx + 2][11 - centery2] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -1039,10 +1056,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery2] = 1;
-            lightArray[centerx][11 - centery3] = 1;
-            lightArray[centerx][11 - centery4] = 1;
-            lightArray[centerx + 2][11 - centery3] = 1;
+            lightArray[centerx][11 - centery2] = 5;
+            lightArray[centerx][11 - centery3] = 5;
+            lightArray[centerx][11 - centery4] = 5;
+            lightArray[centerx + 2][11 - centery3] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -1176,10 +1193,10 @@ void shapeI()
         else
         {
 
-            lightArray[centerx][11 - centery3] = true;
-            lightArray[centerx + 2][11 - centery3] = true;
-            lightArray[centerx + 4][11 - centery3] = true;
-            lightArray[centerx + 6][11 - centery3] = true;
+            lightArray[centerx][11 - centery3] = 2;
+            lightArray[centerx + 2][11 - centery3] = 2;
+            lightArray[centerx + 4][11 - centery3] = 2;
+            lightArray[centerx + 6][11 - centery3] = 2;
 
             centerx = 0;
             centery1 = PIN;
@@ -1205,10 +1222,10 @@ void shapeI()
         else
         {
 
-            lightArray[centerx][11 - centery1] = true;
-            lightArray[centerx][11 - centery2] = true;
-            lightArray[centerx][11 - centery3] = true;
-            lightArray[centerx][11 - centery4] = true;
+            lightArray[centerx][11 - centery1] = 2;
+            lightArray[centerx][11 - centery2] = 2;
+            lightArray[centerx][11 - centery3] = 2;
+            lightArray[centerx][11 - centery4] = 2;
 
             centerx = 0;
             centery1 = PIN;
@@ -1299,7 +1316,151 @@ void arrayLight()
                 colR3.setPixelColor(i, colR3.Color(0, 0, 0));
                 break;
             }
-            if (lightArray[i][j] != 0)
+            if (lightArray[i][j] == 1)
+            {
+                switch (11 - j)
+                {
+                case PIN:
+                    col1.setPixelColor(i, col1.Color(220, 0, 0));
+                    break;
+                case PIN2:
+                    col2.setPixelColor(i, col2.Color(220, 0, 0));
+                    break;
+                case PIN3:
+                    col3.setPixelColor(i, col3.Color(220, 0, 0));
+                    break;
+                case PIN4:
+                    col4.setPixelColor(i, col4.Color(220, 0, 0));
+                    break;
+                case PINL1:
+                    colL1.setPixelColor(i, colL1.Color(220, 0, 0));
+                    break;
+                case PINL2:
+                    colL2.setPixelColor(i, colL2.Color(220, 0, 0));
+                    break;
+                case PINL3:
+                    colL3.setPixelColor(i, colL3.Color(220, 0, 0));
+                    break;
+                case PINR1:
+                    colR1.setPixelColor(i, colR1.Color(220, 0, 0));
+                    break;
+                case PINR2:
+                    colR2.setPixelColor(i, colR2.Color(220, 0, 0));
+                    break;
+                case PINR3:
+                    colR3.setPixelColor(i, colR3.Color(220, 0, 0));
+                    break;
+                }
+            }
+            if (lightArray[i][j] == 2)
+            {
+                switch (11 - j)
+                {
+                case PIN:
+                    col1.setPixelColor(i, col1.Color(0, 0, 255));
+                    break;
+                case PIN2:
+                    col2.setPixelColor(i, col2.Color(0, 0, 255));
+                    break;
+                case PIN3:
+                    col3.setPixelColor(i, col3.Color(0, 0, 255));
+                    break;
+                case PIN4:
+                    col4.setPixelColor(i, col4.Color(0, 0, 255));
+                    break;
+                case PINL1:
+                    colL1.setPixelColor(i, colL1.Color(0, 0, 255));
+                    break;
+                case PINL2:
+                    colL2.setPixelColor(i, colL2.Color(0, 0, 255));
+                    break;
+                case PINL3:
+                    colL3.setPixelColor(i, colL3.Color(0, 0, 255));
+                    break;
+                case PINR1:
+                    colR1.setPixelColor(i, colR1.Color(0, 0, 255));
+                    break;
+                case PINR2:
+                    colR2.setPixelColor(i, colR2.Color(0, 0, 255));
+                    break;
+                case PINR3:
+                    colR3.setPixelColor(i, colR3.Color(0, 0, 255));
+                    break;
+                }
+            }
+            if (lightArray[i][j] == 3)
+            {
+                switch (11 - j)
+                {
+                case PIN:
+                    col1.setPixelColor(i, col1.Color(0, 128, 0));
+                    break;
+                case PIN2:
+                    col2.setPixelColor(i, col2.Color(0, 128, 0));
+                    break;
+                case PIN3:
+                    col3.setPixelColor(i, col3.Color(0, 128, 0));
+                    break;
+                case PIN4:
+                    col4.setPixelColor(i, col4.Color(0, 128, 0));
+                    break;
+                case PINL1:
+                    colL1.setPixelColor(i, colL1.Color(0, 128, 0));
+                    break;
+                case PINL2:
+                    colL2.setPixelColor(i, colL2.Color(0, 128, 0));
+                    break;
+                case PINL3:
+                    colL3.setPixelColor(i, colL3.Color(0, 128, 0));
+                    break;
+                case PINR1:
+                    colR1.setPixelColor(i, colR1.Color(0, 128, 0));
+                    break;
+                case PINR2:
+                    colR2.setPixelColor(i, colR2.Color(0, 128, 0));
+                    break;
+                case PINR3:
+                    colR3.setPixelColor(i, colR3.Color(0, 128, 0));
+                    break;
+                }
+            }
+            if (lightArray[i][j] == 4)
+            {
+                switch (11 - j)
+                {
+                case PIN:
+                    col1.setPixelColor(i, col1.Color(255, 255, 0));
+                    break;
+                case PIN2:
+                    col2.setPixelColor(i, col2.Color(255, 255, 0));
+                    break;
+                case PIN3:
+                    col3.setPixelColor(i, col3.Color(255, 255, 0));
+                    break;
+                case PIN4:
+                    col4.setPixelColor(i, col4.Color(255, 255, 0));
+                    break;
+                case PINL1:
+                    colL1.setPixelColor(i, colL1.Color(255, 255, 0));
+                    break;
+                case PINL2:
+                    colL2.setPixelColor(i, colL2.Color(255, 255, 0));
+                    break;
+                case PINL3:
+                    colL3.setPixelColor(i, colL3.Color(255, 255, 0));
+                    break;
+                case PINR1:
+                    colR1.setPixelColor(i, colR1.Color(255, 255, 0));
+                    break;
+                case PINR2:
+                    colR2.setPixelColor(i, colR2.Color(255, 255, 0));
+                    break;
+                case PINR3:
+                    colR3.setPixelColor(i, colR3.Color(255, 255, 0));
+                    break;
+                }
+            }
+            if (lightArray[i][j] == 5)
             {
                 switch (11 - j)
                 {
@@ -2253,58 +2414,58 @@ void lightO(int centerx)
     switch (centery1)
     {
     case PIN:
-        col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-        col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-        col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-        col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
+        col2.setPixelColor(centerx, col2.Color(0, 128, 0));
+        col2.setPixelColor(centerx + 2, col2.Color(0, 128, 0));
+        col3.setPixelColor(centerx, col3.Color(0, 128, 0));
+        col3.setPixelColor(centerx + 2, col3.Color(0, 128, 0));
         break;
     case PIN2:
-        col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-        col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-        col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-        col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
+        col3.setPixelColor(centerx, col3.Color(0, 128, 0));
+        col3.setPixelColor(centerx + 2, col3.Color(0, 128, 0));
+        col4.setPixelColor(centerx, col4.Color(0, 128, 0));
+        col4.setPixelColor(centerx + 2, col4.Color(0, 128, 0));
         break;
     case PIN3:
-        col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-        col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-        colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-        colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
+        col4.setPixelColor(centerx, col4.Color(0, 128, 0));
+        col4.setPixelColor(centerx + 2, col4.Color(0, 128, 0));
+        colL1.setPixelColor(centerx, colL1.Color(0, 128, 0));
+        colL1.setPixelColor(centerx + 2, colL1.Color(0, 128, 0));
         break;
     case PIN4:
-        colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-        colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-        colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-        colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
+        colL1.setPixelColor(centerx, colL1.Color(0, 128, 0));
+        colL1.setPixelColor(centerx + 2, colL1.Color(0, 128, 0));
+        colL2.setPixelColor(centerx, colL2.Color(0, 128, 0));
+        colL2.setPixelColor(centerx + 2, colL2.Color(0, 128, 0));
         break;
     case PINL1:
-        colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-        colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
-        colL3.setPixelColor(centerx, colL3.Color(255, 0, 255));
-        colL3.setPixelColor(centerx + 2, colL3.Color(255, 0, 255));
+        colL2.setPixelColor(centerx, colL2.Color(0, 128, 0));
+        colL2.setPixelColor(centerx + 2, colL2.Color(0, 128, 0));
+        colL3.setPixelColor(centerx, colL3.Color(0, 128, 0));
+        colL3.setPixelColor(centerx + 2, colL3.Color(0, 128, 0));
         break;
     case PINR1:
-        col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-        col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-        col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-        col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
+        col1.setPixelColor(centerx, col1.Color(0, 128, 0));
+        col1.setPixelColor(centerx + 2, col1.Color(0, 128, 0));
+        col2.setPixelColor(centerx, col2.Color(0, 128, 0));
+        col2.setPixelColor(centerx + 2, col2.Color(0, 128, 0));
         break;
     case PINR2:
-        colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-        colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-        col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-        col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
+        colR1.setPixelColor(centerx, colR1.Color(0, 128, 0));
+        colR1.setPixelColor(centerx + 2, colR1.Color(0, 128, 0));
+        col1.setPixelColor(centerx, col1.Color(0, 128, 0));
+        col1.setPixelColor(centerx + 2, col1.Color(0, 128, 0));
         break;
     case PINR3:
-        colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-        colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-        colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-        colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
+        colR2.setPixelColor(centerx, colR2.Color(0, 128, 0));
+        colR2.setPixelColor(centerx + 2, colR2.Color(0, 128, 0));
+        colR1.setPixelColor(centerx, colR1.Color(0, 128, 0));
+        colR1.setPixelColor(centerx + 2, colR1.Color(0, 128, 0));
         break;
     case PINR3 - 1:
-        colR3.setPixelColor(centerx, colR3.Color(255, 0, 255));
-        colR3.setPixelColor(centerx + 2, colR3.Color(255, 0, 255));
-        colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-        colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
+        colR3.setPixelColor(centerx, colR3.Color(0, 128, 0));
+        colR3.setPixelColor(centerx + 2, colR3.Color(0, 128, 0));
+        colR2.setPixelColor(centerx, colR2.Color(0, 128, 0));
+        colR2.setPixelColor(centerx + 2, colR2.Color(0, 128, 0));
         break;
     }
 }
@@ -2317,72 +2478,72 @@ void lightL(int centerx)
         {
         case PIN:
 
-            col2.setPixelColor(centerx + 4, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 4, col3.Color(255, 0, 255));
+            col2.setPixelColor(centerx + 4, col2.Color(220, 0, 0));
+            col3.setPixelColor(centerx, col3.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 4, col3.Color(220, 0, 0));
 
             break;
         case PIN2:
 
-            col3.setPixelColor(centerx + 4, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 4, col4.Color(255, 0, 255));
+            col3.setPixelColor(centerx + 4, col3.Color(220, 0, 0));
+            col4.setPixelColor(centerx, col4.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 4, col4.Color(220, 0, 0));
 
             break;
         case PIN3:
 
-            col4.setPixelColor(centerx + 4, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 4, colL1.Color(255, 0, 255));
+            col4.setPixelColor(centerx + 4, col4.Color(220, 0, 0));
+            colL1.setPixelColor(centerx, colL1.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 4, colL1.Color(220, 0, 0));
 
             break;
         case PIN4:
 
-            colL1.setPixelColor(centerx + 4, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 4, colL2.Color(255, 0, 255));
+            colL1.setPixelColor(centerx + 4, colL1.Color(220, 0, 0));
+            colL2.setPixelColor(centerx, colL2.Color(220, 0, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(220, 0, 0));
+            colL2.setPixelColor(centerx + 4, colL2.Color(220, 0, 0));
 
             break;
         case PINL1:
 
-            colL2.setPixelColor(centerx + 4, colL2.Color(255, 0, 255));
-            colL3.setPixelColor(centerx, colL3.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 2, colL3.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 4, colL3.Color(255, 0, 255));
+            colL2.setPixelColor(centerx + 4, colL2.Color(220, 0, 0));
+            colL3.setPixelColor(centerx, colL3.Color(220, 0, 0));
+            colL3.setPixelColor(centerx + 2, colL3.Color(220, 0, 0));
+            colL3.setPixelColor(centerx + 4, colL3.Color(220, 0, 0));
             break;
         case PINR1:
 
-            col1.setPixelColor(centerx + 4, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 4, col2.Color(255, 0, 255));
+            col1.setPixelColor(centerx + 4, col1.Color(220, 0, 0));
+            col2.setPixelColor(centerx, col2.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 4, col2.Color(220, 0, 0));
 
             break;
         case PINR2:
 
-            colR1.setPixelColor(centerx + 4, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 4, col1.Color(255, 0, 255));
+            colR1.setPixelColor(centerx + 4, colR1.Color(220, 0, 0));
+            col1.setPixelColor(centerx, col1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 4, col1.Color(220, 0, 0));
 
             break;
         case PINR3:
 
-            colR2.setPixelColor(centerx + 4, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 4, colR1.Color(255, 0, 255));
+            colR2.setPixelColor(centerx + 4, colR2.Color(220, 0, 0));
+            colR1.setPixelColor(centerx, colR1.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 4, colR1.Color(220, 0, 0));
 
             break;
         case PINR3 - 1:
-            colR3.setPixelColor(centerx + 4, colR3.Color(255, 0, 255));
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 4, colR2.Color(255, 0, 255));
+            colR3.setPixelColor(centerx + 4, colR3.Color(220, 0, 0));
+            colR2.setPixelColor(centerx, colR2.Color(220, 0, 0));
+            colR2.setPixelColor(centerx + 2, colR2.Color(220, 0, 0));
+            colR2.setPixelColor(centerx + 4, colR2.Color(220, 0, 0));
 
             break;
         }
@@ -2393,65 +2554,65 @@ void lightL(int centerx)
         {
         case PIN:
 
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(220, 0, 0));
+            col2.setPixelColor(centerx, col2.Color(220, 0, 0));
+            col3.setPixelColor(centerx, col3.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(220, 0, 0));
 
             break;
         case PIN2:
 
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(220, 0, 0));
+            col3.setPixelColor(centerx, col3.Color(220, 0, 0));
+            col4.setPixelColor(centerx, col4.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(220, 0, 0));
 
             break;
         case PIN3:
 
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(220, 0, 0));
+            col4.setPixelColor(centerx, col4.Color(220, 0, 0));
+            colL1.setPixelColor(centerx, colL1.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(220, 0, 0));
 
             break;
         case PIN4:
 
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(220, 0, 0));
+            colL1.setPixelColor(centerx, colL1.Color(220, 0, 0));
+            colL2.setPixelColor(centerx, colL2.Color(220, 0, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(220, 0, 0));
 
             break;
         case PINL1:
 
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL3.setPixelColor(centerx, colL3.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 2, colL3.Color(255, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(220, 0, 0));
+            colL2.setPixelColor(centerx, colL2.Color(220, 0, 0));
+            colL3.setPixelColor(centerx, colL3.Color(220, 0, 0));
+            colL3.setPixelColor(centerx + 2, colL3.Color(220, 0, 0));
             break;
         case PINR1:
 
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(220, 0, 0));
+            col1.setPixelColor(centerx, col1.Color(220, 0, 0));
+            col2.setPixelColor(centerx, col2.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(220, 0, 0));
 
             break;
         case PINR2:
 
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
+            colR2.setPixelColor(centerx, colR2.Color(220, 0, 0));
+            colR1.setPixelColor(centerx, colR1.Color(220, 0, 0));
+            col1.setPixelColor(centerx, col1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(220, 0, 0));
 
             break;
         case PINR3:
 
-            colR3.setPixelColor(centerx, colR3.Color(255, 0, 255));
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
+            colR3.setPixelColor(centerx, colR3.Color(220, 0, 0));
+            colR2.setPixelColor(centerx, colR2.Color(220, 0, 0));
+            colR1.setPixelColor(centerx, colR1.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(220, 0, 0));
 
             break;
         }
@@ -2462,73 +2623,73 @@ void lightL(int centerx)
         {
         case PIN:
 
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 4, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 4, col2.Color(220, 0, 0));
+            col3.setPixelColor(centerx, col3.Color(220, 0, 0));
 
             break;
         case PIN2:
 
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 4, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 4, col3.Color(220, 0, 0));
+            col4.setPixelColor(centerx, col4.Color(220, 0, 0));
 
             break;
         case PIN3:
 
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 4, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 4, col4.Color(220, 0, 0));
+            colL1.setPixelColor(centerx, colL1.Color(220, 0, 0));
 
             break;
         case PIN4:
 
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 4, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 4, colL1.Color(220, 0, 0));
+            colL2.setPixelColor(centerx, colL2.Color(220, 0, 0));
 
             break;
         case PINL1:
 
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 4, colL2.Color(255, 0, 255));
-            colL3.setPixelColor(centerx, colL3.Color(255, 0, 255));
+            colL2.setPixelColor(centerx, colL2.Color(220, 0, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(220, 0, 0));
+            colL2.setPixelColor(centerx + 4, colL2.Color(220, 0, 0));
+            colL3.setPixelColor(centerx, colL3.Color(220, 0, 0));
             break;
         case PINR1:
 
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 4, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 4, col1.Color(220, 0, 0));
+            col2.setPixelColor(centerx, col2.Color(220, 0, 0));
 
             break;
         case PINR2:
 
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 4, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 4, colR1.Color(220, 0, 0));
+            col1.setPixelColor(centerx, col1.Color(220, 0, 0));
 
             break;
         case PINR3:
 
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 4, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
+            colR2.setPixelColor(centerx, colR2.Color(220, 0, 0));
+            colR2.setPixelColor(centerx + 2, colR2.Color(220, 0, 0));
+            colR2.setPixelColor(centerx + 4, colR2.Color(220, 0, 0));
+            colR1.setPixelColor(centerx, colR1.Color(220, 0, 0));
 
             break;
         case PINR3 - 1:
 
-            colR3.setPixelColor(centerx, colR3.Color(255, 0, 255));
-            colR3.setPixelColor(centerx + 2, colR3.Color(255, 0, 255));
-            colR3.setPixelColor(centerx + 4, colR3.Color(255, 0, 255));
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
+            colR3.setPixelColor(centerx, colR3.Color(220, 0, 0));
+            colR3.setPixelColor(centerx + 2, colR3.Color(220, 0, 0));
+            colR3.setPixelColor(centerx + 4, colR3.Color(220, 0, 0));
+            colR2.setPixelColor(centerx, colR2.Color(220, 0, 0));
 
             break;
         }
@@ -2539,65 +2700,65 @@ void lightL(int centerx)
         {
         case PIN:
 
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(220, 0, 0));
 
             break;
         case PIN2:
 
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(220, 0, 0));
 
             break;
         case PIN3:
 
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(220, 0, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(220, 0, 0));
 
             break;
         case PIN4:
 
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(220, 0, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(220, 0, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(220, 0, 0));
 
             break;
         case PINL1:
 
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 2, colL3.Color(255, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(220, 0, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(220, 0, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(220, 0, 0));
+            colL3.setPixelColor(centerx + 2, colL3.Color(220, 0, 0));
             break;
         case PINR1:
 
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(220, 0, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(220, 0, 0));
 
             break;
         case PINR2:
 
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
+            colR2.setPixelColor(centerx, colR2.Color(220, 0, 0));
+            colR2.setPixelColor(centerx + 2, colR2.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(220, 0, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(220, 0, 0));
 
             break;
         case PINR3:
 
-            colR3.setPixelColor(centerx, colR3.Color(255, 0, 255));
-            colR3.setPixelColor(centerx + 2, colR3.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
+            colR3.setPixelColor(centerx, colR3.Color(220, 0, 0));
+            colR3.setPixelColor(centerx + 2, colR3.Color(220, 0, 0));
+            colR2.setPixelColor(centerx + 2, colR2.Color(220, 0, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(220, 0, 0));
 
             break;
         }
@@ -2612,72 +2773,72 @@ void lightZ(int centerx)
         {
         case PIN:
 
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 4, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
+            col2.setPixelColor(centerx + 2, col2.Color(255, 255, 0));
+            col2.setPixelColor(centerx + 4, col2.Color(255, 255, 0));
+            col3.setPixelColor(centerx, col3.Color(255, 255, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(255, 255, 0));
 
             break;
         case PIN2:
 
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 4, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
+            col3.setPixelColor(centerx + 2, col3.Color(255, 255, 0));
+            col3.setPixelColor(centerx + 4, col3.Color(255, 255, 0));
+            col4.setPixelColor(centerx, col4.Color(255, 255, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(255, 255, 0));
 
             break;
         case PIN3:
 
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 4, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
+            col4.setPixelColor(centerx + 2, col4.Color(255, 255, 0));
+            col4.setPixelColor(centerx + 4, col4.Color(255, 255, 0));
+            colL1.setPixelColor(centerx, colL1.Color(255, 255, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(255, 255, 0));
 
             break;
         case PIN4:
 
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 4, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
+            colL1.setPixelColor(centerx + 2, colL1.Color(255, 255, 0));
+            colL1.setPixelColor(centerx + 4, colL1.Color(255, 255, 0));
+            colL2.setPixelColor(centerx, colL2.Color(255, 255, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(255, 255, 0));
 
             break;
         case PINL1:
 
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 4, colL2.Color(255, 0, 255));
-            colL3.setPixelColor(centerx, colL3.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 2, colL3.Color(255, 0, 255));
+            colL2.setPixelColor(centerx + 2, colL2.Color(255, 255, 0));
+            colL2.setPixelColor(centerx + 4, colL2.Color(255, 255, 0));
+            colL3.setPixelColor(centerx, colL3.Color(255, 255, 0));
+            colL3.setPixelColor(centerx + 2, colL3.Color(255, 255, 0));
             break;
         case PINR1:
 
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 4, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
+            col1.setPixelColor(centerx + 2, col1.Color(255, 255, 0));
+            col1.setPixelColor(centerx + 4, col1.Color(255, 255, 0));
+            col2.setPixelColor(centerx, col2.Color(255, 255, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(255, 255, 0));
 
             break;
         case PINR2:
 
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 4, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
+            colR1.setPixelColor(centerx + 2, colR1.Color(255, 255, 0));
+            colR1.setPixelColor(centerx + 4, colR1.Color(255, 255, 0));
+            col1.setPixelColor(centerx, col1.Color(255, 255, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(255, 255, 0));
 
             break;
         case PINR3:
 
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 4, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
+            colR2.setPixelColor(centerx + 2, colR2.Color(255, 255, 0));
+            colR2.setPixelColor(centerx + 4, colR2.Color(255, 255, 0));
+            colR1.setPixelColor(centerx, colR1.Color(255, 255, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(255, 255, 0));
 
             break;
         case PINR3 - 1:
-            colR3.setPixelColor(centerx + 2, colR3.Color(255, 0, 255));
-            colR3.setPixelColor(centerx + 4, colR3.Color(255, 0, 255));
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
+            colR3.setPixelColor(centerx + 2, colR3.Color(255, 255, 0));
+            colR3.setPixelColor(centerx + 4, colR3.Color(255, 255, 0));
+            colR2.setPixelColor(centerx, colR2.Color(255, 255, 0));
+            colR2.setPixelColor(centerx + 2, colR2.Color(255, 255, 0));
 
             break;
         }
@@ -2688,65 +2849,65 @@ void lightZ(int centerx)
         {
         case PIN:
 
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(255, 255, 0));
+            col2.setPixelColor(centerx, col2.Color(255, 255, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(255, 255, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(255, 255, 0));
 
             break;
         case PIN2:
 
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(255, 255, 0));
+            col3.setPixelColor(centerx, col3.Color(255, 255, 0));
+            col3.setPixelColor(centerx + 2, col3.Color(255, 255, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(255, 255, 0));
 
             break;
         case PIN3:
 
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(255, 255, 0));
+            col4.setPixelColor(centerx, col4.Color(255, 255, 0));
+            col4.setPixelColor(centerx + 2, col4.Color(255, 255, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(255, 255, 0));
 
             break;
         case PIN4:
 
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(255, 255, 0));
+            colL1.setPixelColor(centerx, colL1.Color(255, 255, 0));
+            colL1.setPixelColor(centerx + 2, colL1.Color(255, 255, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(255, 255, 0));
 
             break;
         case PINL1:
 
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 2, colL3.Color(255, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(255, 255, 0));
+            colL2.setPixelColor(centerx, colL2.Color(255, 255, 0));
+            colL2.setPixelColor(centerx + 2, colL2.Color(255, 255, 0));
+            colL3.setPixelColor(centerx + 2, colL3.Color(255, 255, 0));
             break;
         case PINR1:
 
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(255, 255, 0));
+            col1.setPixelColor(centerx, col1.Color(255, 255, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(255, 255, 0));
+            col2.setPixelColor(centerx + 2, col2.Color(255, 255, 0));
 
             break;
         case PINR2:
 
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
+            colR2.setPixelColor(centerx, colR2.Color(255, 255, 0));
+            colR1.setPixelColor(centerx, colR1.Color(255, 255, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(255, 255, 0));
+            col1.setPixelColor(centerx + 2, col1.Color(255, 255, 0));
 
             break;
         case PINR3:
 
-            colR3.setPixelColor(centerx, colR3.Color(255, 0, 255));
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
+            colR3.setPixelColor(centerx, colR3.Color(255, 255, 0));
+            colR2.setPixelColor(centerx, colR2.Color(255, 255, 0));
+            colR2.setPixelColor(centerx + 2, colR2.Color(255, 255, 0));
+            colR1.setPixelColor(centerx + 2, colR1.Color(255, 255, 0));
 
             break;
         }
@@ -3006,72 +3167,72 @@ void lightI(int centerx)
         {
         case PIN:
 
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 2, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 4, col3.Color(255, 0, 255));
-            col3.setPixelColor(centerx + 6, col3.Color(255, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(0, 0, 255));
+            col3.setPixelColor(centerx + 2, col3.Color(0, 0, 255));
+            col3.setPixelColor(centerx + 4, col3.Color(0, 0, 255));
+            col3.setPixelColor(centerx + 6, col3.Color(0, 0, 255));
 
             break;
         case PIN2:
 
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 2, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 4, col4.Color(255, 0, 255));
-            col4.setPixelColor(centerx + 6, col4.Color(255, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(0, 0, 255));
+            col4.setPixelColor(centerx + 2, col4.Color(0, 0, 255));
+            col4.setPixelColor(centerx + 4, col4.Color(0, 0, 255));
+            col4.setPixelColor(centerx + 6, col4.Color(0, 0, 255));
 
             break;
         case PIN3:
 
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 2, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 4, colL1.Color(255, 0, 255));
-            colL1.setPixelColor(centerx + 6, colL1.Color(255, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(0, 0, 255));
+            colL1.setPixelColor(centerx + 2, colL1.Color(0, 0, 255));
+            colL1.setPixelColor(centerx + 4, colL1.Color(0, 0, 255));
+            colL1.setPixelColor(centerx + 6, colL1.Color(0, 0, 255));
 
             break;
         case PIN4:
 
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 2, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 4, colL2.Color(255, 0, 255));
-            colL2.setPixelColor(centerx + 6, colL2.Color(255, 0, 255));
+            colL2.setPixelColor(centerx, colL2.Color(0, 0, 255));
+            colL2.setPixelColor(centerx + 2, colL2.Color(0, 0, 255));
+            colL2.setPixelColor(centerx + 4, colL2.Color(0, 0, 255));
+            colL2.setPixelColor(centerx + 6, colL2.Color(0, 0, 255));
 
             break;
         case PINL1:
 
-            colL3.setPixelColor(centerx, colL3.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 2, colL3.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 4, colL3.Color(255, 0, 255));
-            colL3.setPixelColor(centerx + 6, colL3.Color(255, 0, 255));
+            colL3.setPixelColor(centerx, colL3.Color(0, 0, 255));
+            colL3.setPixelColor(centerx + 2, colL3.Color(0, 0, 255));
+            colL3.setPixelColor(centerx + 4, colL3.Color(0, 0, 255));
+            colL3.setPixelColor(centerx + 6, colL3.Color(0, 0, 255));
             break;
         case PINR1:
 
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 2, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 4, col2.Color(255, 0, 255));
-            col2.setPixelColor(centerx + 6, col2.Color(255, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(0, 0, 255));
+            col2.setPixelColor(centerx + 2, col2.Color(0, 0, 255));
+            col2.setPixelColor(centerx + 4, col2.Color(0, 0, 255));
+            col2.setPixelColor(centerx + 6, col2.Color(0, 0, 255));
 
             break;
         case PINR2:
 
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 2, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 4, col1.Color(255, 0, 255));
-            col1.setPixelColor(centerx + 6, col1.Color(255, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(0, 0, 255));
+            col1.setPixelColor(centerx + 2, col1.Color(0, 0, 255));
+            col1.setPixelColor(centerx + 4, col1.Color(0, 0, 255));
+            col1.setPixelColor(centerx + 6, col1.Color(0, 0, 255));
 
             break;
         case PINR3:
 
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 2, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 4, colR1.Color(255, 0, 255));
-            colR1.setPixelColor(centerx + 6, colR1.Color(255, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(0, 0, 255));
+            colR1.setPixelColor(centerx + 2, colR1.Color(0, 0, 255));
+            colR1.setPixelColor(centerx + 4, colR1.Color(0, 0, 255));
+            colR1.setPixelColor(centerx + 6, colR1.Color(0, 0, 255));
 
             break;
         case PINR3 - 1:
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 4, colR2.Color(255, 0, 255));
-            colR2.setPixelColor(centerx + 2, colR2.Color(255, 0, 255));
+            colR2.setPixelColor(centerx, colR2.Color(0, 0, 255));
+            colR2.setPixelColor(centerx + 2, colR2.Color(0, 0, 255));
+            colR2.setPixelColor(centerx + 4, colR2.Color(0, 0, 255));
+            colR2.setPixelColor(centerx + 2, colR2.Color(0, 0, 255));
 
             break;
         }
@@ -3082,58 +3243,58 @@ void lightI(int centerx)
         {
         case PIN:
 
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(0, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(0, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(0, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(0, 0, 255));
 
             break;
         case PIN2:
 
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(0, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(0, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(0, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(0, 0, 255));
 
             break;
         case PIN3:
 
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(0, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(0, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(0, 0, 255));
+            colL2.setPixelColor(centerx, colL2.Color(0, 0, 255));
 
             break;
         case PIN4:
 
-            col4.setPixelColor(centerx, col4.Color(255, 0, 255));
-            colL1.setPixelColor(centerx, colL1.Color(255, 0, 255));
-            colL2.setPixelColor(centerx, colL2.Color(255, 0, 255));
-            colL3.setPixelColor(centerx, colL3.Color(255, 0, 255));
+            col4.setPixelColor(centerx, col4.Color(0, 0, 255));
+            colL1.setPixelColor(centerx, colL1.Color(0, 0, 255));
+            colL2.setPixelColor(centerx, colL2.Color(0, 0, 255));
+            colL3.setPixelColor(centerx, colL3.Color(0, 0, 255));
 
             break;
         case PINR1:
 
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
-            col3.setPixelColor(centerx, col3.Color(255, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(0, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(0, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(0, 0, 255));
+            col3.setPixelColor(centerx, col3.Color(0, 0, 255));
 
             break;
         case PINR2:
 
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
-            col2.setPixelColor(centerx, col2.Color(255, 0, 255));
+            colR2.setPixelColor(centerx, colR2.Color(0, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(0, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(0, 0, 255));
+            col2.setPixelColor(centerx, col2.Color(0, 0, 255));
 
             break;
         case PINR3:
 
-            colR3.setPixelColor(centerx, colR3.Color(255, 0, 255));
-            colR2.setPixelColor(centerx, colR2.Color(255, 0, 255));
-            colR1.setPixelColor(centerx, colR1.Color(255, 0, 255));
-            col1.setPixelColor(centerx, col1.Color(255, 0, 255));
+            colR3.setPixelColor(centerx, colR3.Color(0, 0, 255));
+            colR2.setPixelColor(centerx, colR2.Color(0, 0, 255));
+            colR1.setPixelColor(centerx, colR1.Color(0, 0, 255));
+            col1.setPixelColor(centerx, col1.Color(0, 0, 255));
 
             break;
         }
