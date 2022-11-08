@@ -24,7 +24,10 @@
 #define BUTTON_ROTATE A5
 #define BUTTON_SPEEDUP A2
 #define BUTTON_START A1
-#define BUTTON_DROP A8
+#define BUTTON_DROP A0
+// new pins for shape prediction
+#define PINPREL A6
+#define PINPRER A7
 
 #define SD_ChipSelectPin 53 // example uses hardware SS pin 53 on Mega2560
 
@@ -39,6 +42,9 @@ Adafruit_NeoPixel colL3(NUMPIXELS, PINL3, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel colR1(NUMPIXELS, PINR1, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel colR2(NUMPIXELS, PINR2, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel colR3(NUMPIXELS, PINR3, NEO_GRB + NEO_KHZ800);
+// new cols for shape prediction
+Adafruit_NeoPixel colPL(NUMPIXELS, PINPREL, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel colPR(NUMPIXELS, PINPRER, NEO_GRB + NEO_KHZ800);
 // L rgb(220,0,0) 1
 // I rgb(0,0,255) 2
 // O rgb(0,128,0) 3
@@ -70,6 +76,7 @@ int lightArray[38][10]; // record the light pixel
 bool currentLanded = true;
 long currentShape = -1;
 long randNumber = -1;
+long randNumberNext = -1;
 int score = 0;
 int currentL = 0;
 int currentT = 0;
@@ -124,6 +131,8 @@ void setup()
     pinMode(BUTTON_SPEEDUP, INPUT);
     randomSeed(analogRead(0));
     randNumber = random(0, 5);
+    // new add random
+    randNumberNext = random(0, 5);
 
     for (int i = 0; i < 38; i++)
     {
@@ -172,6 +181,8 @@ void setup()
     colR1.begin();
     colR2.begin();
     colR3.begin();
+    colPL.begin();
+    colPR.begin();
 }
 
 void loop()
@@ -192,6 +203,8 @@ void loop()
     colR1.setBrightness(10);
     colR2.setBrightness(10);
     colR3.setBrightness(10);
+    colPL.setBrightness(10);
+    colPR.setBrightness(10);
 
     // shapeI();
     randomShape(randNumber);
@@ -212,11 +225,13 @@ void showCol()
     colR1.show();
     colR2.show();
     colR3.show();
+    colPR.show();
+    colPL.show();
 }
 
 void randomShape(int currentShape)
 {
-    if (lightArray[0][4] == 0 && lightArray[0][5] == 0)
+    if (lightArray[0][0] == 0 && lightArray[0][1] == 0 && lightArray[0][2] == 0 && lightArray[0][3] == 0 && lightArray[0][4] == 0 && lightArray[0][5] == 0 && lightArray[0][6] == 0 && lightArray[0][7] == 0 && lightArray[0][8] == 0 && lightArray[0][9] == 0)
     {
         switch (currentShape)
         {
@@ -292,6 +307,14 @@ void endGame()
             }
         }
     }
+    colPL.setPixelColor(0, colPL.Color(255, 255, 255));
+    colPL.setPixelColor(2, colPL.Color(255, 255, 255));
+    colPL.setPixelColor(4, colPL.Color(255, 255, 255));
+    colPL.setPixelColor(6, colPL.Color(255, 255, 255));
+    colPR.setPixelColor(0, colPL.Color(255, 255, 255));
+    colPR.setPixelColor(2, colPL.Color(255, 255, 255));
+    colPR.setPixelColor(4, colPL.Color(255, 255, 255));
+    colPR.setPixelColor(6, colPL.Color(255, 255, 255));
     showCol();
     for (int i = 0; i < 38; i++)
     {
@@ -350,6 +373,14 @@ void endGame()
                     }
                 }
             }
+            colPL.setPixelColor(0, colPL.Color(0, 0, 0));
+            colPL.setPixelColor(2, colPL.Color(0, 0, 0));
+            colPL.setPixelColor(4, colPL.Color(0, 0, 0));
+            colPL.setPixelColor(6, colPL.Color(0, 0, 0));
+            colPR.setPixelColor(0, colPL.Color(0, 0, 0));
+            colPR.setPixelColor(2, colPL.Color(0, 0, 0));
+            colPR.setPixelColor(4, colPL.Color(0, 0, 0));
+            colPR.setPixelColor(6, colPL.Color(0, 0, 0));
             showCol();
 
             Serial.begin(9600);
@@ -360,6 +391,7 @@ void endGame()
             pinMode(BUTTON_START, INPUT);
             randomSeed(analogRead(0));
             randNumber = random(0, 5);
+            randNumberNext = random(0, 5);
 
             for (int i = 0; i < 38; i++)
             {
@@ -380,6 +412,8 @@ void endGame()
             colR1.begin();
             colR2.begin();
             colR3.begin();
+            colPL.begin();
+            colPR.begin();
             break;
         }
     }
@@ -392,7 +426,24 @@ void shapeO()
     centery3b = centery3;
     centery4b = centery4;
     lightO(centerx);
-
+    switch (randNumberNext)
+    {
+    case 0:
+        lightOPre();
+        break;
+    case 1:
+        lightZPre();
+        break;
+    case 2:
+        lightLPre();
+        break;
+    case 3:
+        lightTPre();
+        break;
+    case 4:
+        lightIPre();
+        break;
+    }
     showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
@@ -459,8 +510,27 @@ void shapeO()
         centery3 = PIN3;
         centery4 = PIN4;
         checkLine();
+        switch (randNumberNext)
+        {
+        case 0:
+            turnoffOPre();
+            break;
+        case 1:
+            turnoffZPre();
+            break;
+        case 2:
+            turnoffLPre();
+            break;
+        case 3:
+            turnoffTPre();
+            break;
+        case 4:
+            turnoffIPre();
+            break;
+        }
         showCol();
-        randNumber = random(0, 5);
+        randNumber = randNumberNext;
+        randNumberNext = random(0, 5);
     }
 
     else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -485,8 +555,27 @@ void shapeO()
         centery3 = PIN3;
         centery4 = PIN4;
         checkLine();
+        switch (randNumberNext)
+        {
+        case 0:
+            turnoffOPre();
+            break;
+        case 1:
+            turnoffZPre();
+            break;
+        case 2:
+            turnoffLPre();
+            break;
+        case 3:
+            turnoffTPre();
+            break;
+        case 4:
+            turnoffIPre();
+            break;
+        }
         showCol();
-        randNumber = random(0, 5);
+        randNumber = randNumberNext;
+        randNumberNext = random(0, 5);
     }
 }
 
@@ -498,7 +587,24 @@ void shapeL()
     centery3b = centery3;
     centery4b = centery4;
     lightL(centerx);
-
+    switch (randNumberNext)
+    {
+    case 0:
+        lightOPre();
+        break;
+    case 1:
+        lightZPre();
+        break;
+    case 2:
+        lightLPre();
+        break;
+    case 3:
+        lightTPre();
+        break;
+    case 4:
+        lightIPre();
+        break;
+    }
     showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
@@ -710,8 +816,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3] == 0))
@@ -733,8 +858,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -759,8 +903,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -782,8 +945,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -807,8 +989,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + SPEED][17 - centery3] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0))
@@ -830,8 +1031,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -855,8 +1075,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -878,8 +1117,27 @@ void shapeL()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -893,7 +1151,24 @@ void shapeZ()
     centery3b = centery3;
     centery4b = centery4;
     lightZ(centerx);
-
+    switch (randNumberNext)
+    {
+    case 0:
+        lightOPre();
+        break;
+    case 1:
+        lightZPre();
+        break;
+    case 2:
+        lightLPre();
+        break;
+    case 3:
+        lightTPre();
+        break;
+    case 4:
+        lightIPre();
+        break;
+    }
     showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
@@ -1015,8 +1290,27 @@ void shapeZ()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentZ = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1041,8 +1335,27 @@ void shapeZ()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentZ = 0;
         }
     }
@@ -1066,8 +1379,27 @@ void shapeZ()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentZ = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1092,8 +1424,27 @@ void shapeZ()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentZ = 0;
         }
     }
@@ -1106,7 +1457,24 @@ void shapeT()
     centery3b = centery3;
     centery4b = centery4;
     lightT(centerx);
-
+    switch (randNumberNext)
+    {
+    case 0:
+        lightOPre();
+        break;
+    case 1:
+        lightZPre();
+        break;
+    case 2:
+        lightLPre();
+        break;
+    case 3:
+        lightTPre();
+        break;
+    case 4:
+        lightIPre();
+        break;
+    }
     showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
@@ -1281,8 +1649,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1303,8 +1690,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1328,8 +1734,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery4] == 0))
@@ -1350,8 +1775,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1375,8 +1819,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery3] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0))
@@ -1397,8 +1860,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1422,8 +1904,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0) && (lightArray[centerx + SPEED][17 - centery4] == 0))
@@ -1444,8 +1945,27 @@ void shapeT()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1459,7 +1979,24 @@ void shapeI()
     centery3b = centery3;
     centery4b = centery4;
     lightI(centerx);
-
+    switch (randNumberNext)
+    {
+    case 0:
+        lightOPre();
+        break;
+    case 1:
+        lightZPre();
+        break;
+    case 2:
+        lightLPre();
+        break;
+    case 3:
+        lightTPre();
+        break;
+    case 4:
+        lightIPre();
+        break;
+    }
     showCol();
 
     currentStateL = digitalRead(BUTTON_LEFT);
@@ -1579,8 +2116,27 @@ void shapeI()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentI = 0;
         }
         else if ((centerx < NUMPIXELS - 8) && (lightArray[centerx + 6 + SPEED][17 - centery3] == 0))
@@ -1605,8 +2161,27 @@ void shapeI()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentI = 0;
         }
     }
@@ -1630,8 +2205,27 @@ void shapeI()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentI = 0;
         }
         else if ((centerx < NUMPIXELS) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + SPEED][17 - centery3] == 0) && (lightArray[centerx + SPEED][17 - centery4] == 0))
@@ -1656,8 +2250,27 @@ void shapeI()
             centery3 = PIN3;
             centery4 = PIN4;
             checkLine();
+            switch (randNumberNext)
+            {
+            case 0:
+                turnoffOPre();
+                break;
+            case 1:
+                turnoffZPre();
+                break;
+            case 2:
+                turnoffLPre();
+                break;
+            case 3:
+                turnoffTPre();
+                break;
+            case 4:
+                turnoffIPre();
+                break;
+            }
             showCol();
-            randNumber = random(0, 5);
+            randNumber = randNumberNext;
+            randNumberNext = random(0, 5);
             currentI = 0;
         }
     }
@@ -1679,11 +2292,62 @@ void checkLine()
         {
             score += 1;
             arrayUpdate(i);
+            blink(i);
             audio_state = add_point;
             i = i + 2;
         }
     }
     arrayLight();
+}
+void blink(int line)
+{
+    col1.setPixelColor(line, col1.Color(0, 0, 0));
+    col2.setPixelColor(line, col1.Color(0, 0, 0));
+    col3.setPixelColor(line, col1.Color(0, 0, 0));
+    col4.setPixelColor(line, col1.Color(0, 0, 0));
+    colL1.setPixelColor(line, col1.Color(0, 0, 0));
+    colL2.setPixelColor(line, col1.Color(0, 0, 0));
+    colL3.setPixelColor(line, col1.Color(0, 0, 0));
+    colR1.setPixelColor(line, col1.Color(0, 0, 0));
+    colR2.setPixelColor(line, col1.Color(0, 0, 0));
+    colR3.setPixelColor(line, col1.Color(0, 0, 0));
+    showCol();
+    delay(50);
+    col1.setPixelColor(line, col1.Color(255, 255, 255));
+    col2.setPixelColor(line, col1.Color(255, 255, 255));
+    col3.setPixelColor(line, col1.Color(255, 255, 255));
+    col4.setPixelColor(line, col1.Color(255, 255, 255));
+    colL1.setPixelColor(line, col1.Color(255, 255, 255));
+    colL2.setPixelColor(line, col1.Color(255, 255, 255));
+    colL3.setPixelColor(line, col1.Color(255, 255, 255));
+    colR1.setPixelColor(line, col1.Color(255, 255, 255));
+    colR2.setPixelColor(line, col1.Color(255, 255, 255));
+    colR3.setPixelColor(line, col1.Color(255, 255, 255));
+    showCol();
+    delay(50);
+    col1.setPixelColor(line, col1.Color(0, 0, 0));
+    col2.setPixelColor(line, col1.Color(0, 0, 0));
+    col3.setPixelColor(line, col1.Color(0, 0, 0));
+    col4.setPixelColor(line, col1.Color(0, 0, 0));
+    colL1.setPixelColor(line, col1.Color(0, 0, 0));
+    colL2.setPixelColor(line, col1.Color(0, 0, 0));
+    colL3.setPixelColor(line, col1.Color(0, 0, 0));
+    colR1.setPixelColor(line, col1.Color(0, 0, 0));
+    colR2.setPixelColor(line, col1.Color(0, 0, 0));
+    colR3.setPixelColor(line, col1.Color(0, 0, 0));
+    showCol();
+    delay(50);
+    col1.setPixelColor(line, col1.Color(255, 255, 255));
+    col2.setPixelColor(line, col1.Color(255, 255, 255));
+    col3.setPixelColor(line, col1.Color(255, 255, 255));
+    col4.setPixelColor(line, col1.Color(255, 255, 255));
+    colL1.setPixelColor(line, col1.Color(255, 255, 255));
+    colL2.setPixelColor(line, col1.Color(255, 255, 255));
+    colL3.setPixelColor(line, col1.Color(255, 255, 255));
+    colR1.setPixelColor(line, col1.Color(255, 255, 255));
+    colR2.setPixelColor(line, col1.Color(255, 255, 255));
+    colR3.setPixelColor(line, col1.Color(255, 255, 255));
+    showCol();
 }
 
 void arrayUpdate(int line)
@@ -3724,6 +4388,79 @@ void lightI(int centerx)
             break;
         }
     }
+}
+// light for shape prediction
+void lightOPre()
+{
+    colPL.setPixelColor(0, colPL.Color(0, 128, 0));
+    colPL.setPixelColor(2, colPL.Color(0, 128, 0));
+    colPR.setPixelColor(0, colPR.Color(0, 128, 0));
+    colPR.setPixelColor(2, colPR.Color(0, 128, 0));
+}
+void lightTPre()
+{
+    colPR.setPixelColor(0, colPR.Color(255, 0, 255));
+    colPR.setPixelColor(2, colPR.Color(255, 0, 255));
+    colPR.setPixelColor(4, colPR.Color(255, 0, 255));
+    colPL.setPixelColor(2, colPR.Color(255, 0, 255));
+}
+void lightZPre()
+{
+    colPL.setPixelColor(0, colPR.Color(255, 255, 0));
+    colPL.setPixelColor(2, colPR.Color(255, 255, 0));
+    colPR.setPixelColor(2, colPR.Color(255, 255, 0));
+    colPR.setPixelColor(4, colPR.Color(255, 255, 0));
+}
+void lightLPre()
+{
+    colPR.setPixelColor(4, colPR.Color(220, 0, 0));
+    colPL.setPixelColor(0, colPL.Color(220, 0, 0));
+    colPL.setPixelColor(2, colPL.Color(220, 0, 0));
+    colPL.setPixelColor(4, colPL.Color(220, 0, 0));
+}
+void lightIPre()
+{
+    colPL.setPixelColor(0, colPL.Color(0, 0, 255));
+    colPL.setPixelColor(2, colPL.Color(0, 0, 255));
+    colPL.setPixelColor(4, colPL.Color(0, 0, 255));
+    colPL.setPixelColor(6, colPL.Color(0, 0, 255));
+}
+
+// turnoff for shape prediction
+void turnoffOPre()
+{
+    colPL.setPixelColor(0, colPL.Color(0, 0, 0));
+    colPL.setPixelColor(2, colPL.Color(0, 0, 0));
+    colPR.setPixelColor(0, colPR.Color(0, 0, 0));
+    colPR.setPixelColor(2, colPR.Color(0, 0, 0));
+}
+void turnoffTPre()
+{
+    colPR.setPixelColor(0, colPR.Color(0, 0, 0));
+    colPR.setPixelColor(2, colPR.Color(0, 0, 0));
+    colPR.setPixelColor(4, colPR.Color(0, 0, 0));
+    colPL.setPixelColor(2, colPR.Color(0, 0, 0));
+}
+void turnoffZPre()
+{
+    colPL.setPixelColor(0, colPR.Color(0, 0, 0));
+    colPL.setPixelColor(2, colPR.Color(0, 0, 0));
+    colPR.setPixelColor(2, colPR.Color(0, 0, 0));
+    colPR.setPixelColor(4, colPR.Color(0, 0, 0));
+}
+void turnoffLPre()
+{
+    colPR.setPixelColor(4, colPR.Color(0, 0, 0));
+    colPL.setPixelColor(0, colPL.Color(0, 0, 0));
+    colPL.setPixelColor(2, colPL.Color(0, 0, 0));
+    colPL.setPixelColor(4, colPL.Color(0, 0, 0));
+}
+void turnoffIPre()
+{
+    colPL.setPixelColor(0, colPL.Color(0, 0, 0));
+    colPL.setPixelColor(2, colPL.Color(0, 0, 0));
+    colPL.setPixelColor(4, colPL.Color(0, 0, 0));
+    colPL.setPixelColor(6, colPL.Color(0, 0, 0));
 }
 
 void displayScore(int score)
