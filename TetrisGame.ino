@@ -2,18 +2,18 @@
 #ifdef __AVR__
 #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
 #endif
-#define PIN 5
+#define PIN 11
 #define NUMPIXELS 38
 #define SPEED 2
-#define PIN2 6
-#define PIN3 7
-#define PIN4 8
-#define PINL1 9
-#define PINL2 10
-#define PINL3 11
-#define PINR1 4
-#define PINR2 3
-#define PINR3 2
+#define PIN2 12
+#define PIN3 13
+#define PIN4 14
+#define PINL1 15
+#define PINL2 16
+#define PINL3 17
+#define PINR1 10
+#define PINR2 9
+#define PINR3 8
 #define BUTTON_LEFT A3
 #define BUTTON_RIGHT A4
 #define BUTTON_ROTATE A5
@@ -130,70 +130,27 @@ void showCol()
 
 void randomShape(int currentShape)
 {
-    switch (currentShape)
+    if (lightArray[0][4] == 0 && lightArray[0][5] == 0)
     {
-    case 0:
-        if (lightArray[centerx][11 - centery2] == 0 && lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery2] == 0 && lightArray[centerx + 2][11 - centery3] == 0)
+        switch (currentShape)
         {
+        case 0:
             shapeO();
-        }
-        else
-        {
-            // Game Over;
-            Serial.println("enter case0 else");
-            endGame();
-        }
-        break;
-    case 1:
-        if (lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery2] == 0 && lightArray[centerx + 4][11 - centery2] == 0)
-        {
+        case 1:
             shapeZ();
-        }
-        else
-        {
-            // Game Over;
-            Serial.println("enter case1 else");
-            endGame();
-        }
-
-        break;
-    case 2:
-        if (lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx + 4][11 - centery3] == 0 && lightArray[centerx + 4][11 - centery2] == 0)
-        {
+        case 2:
             shapeL();
-        }
-        else
-        {
-            // Game Over;
-            Serial.println("enter case2 else");
-            endGame();
-        }
-        break;
-    case 3:
-        if (lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx][11 - centery2] == 0 && lightArray[centerx + 2][11 - centery2] == 0 && lightArray[centerx + 4][11 - centery2] == 0)
-        {
+        case 3:
             shapeT();
-        }
-        else
-        {
-            // Game Over;
-            Serial.println("enter case3 else");
-            endGame();
-        }
-        break;
-    case 4:
-        if (lightArray[centerx][11 - centery3] == 0 && lightArray[centerx + 2][11 - centery3] == 0 && lightArray[centerx + 4][11 - centery3] == 0 && lightArray[centerx + 6][11 - centery3] == 0)
-        {
+        case 4:
             shapeI();
         }
-        else
-        {
-            // Game Over;
-            Serial.println("enter case4 else");
-            endGame();
-        }
-        break;
     }
+    else
+    {
+        endGame();
+    }
+
     currentLanded = false;
 }
 
@@ -205,7 +162,7 @@ void endGame()
     {
         for (int j = 0; j < 10; j++)
         {
-            switch (11 - j)
+            switch (17 - j)
             {
             case PIN:
                 col1.setPixelColor(i, col1.Color(255, 255, 255));
@@ -248,6 +205,8 @@ void endGame()
             lightArray[i][j] = 0;
         }
     }
+    // 10.20新加
+    centerx = 0;
     if (highestScore <= score)
     {
         highestScore = score;
@@ -271,7 +230,7 @@ void shapeO()
     currentStateR = digitalRead(BUTTON_RIGHT);
     SpeedUp = digitalRead(BUTTON_SPEEDUP);
 
-    if (currentStateL == HIGH && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0))
+    if (currentStateL == HIGH && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0))
     {
 
         if (centery3 < PINL3)
@@ -286,7 +245,7 @@ void shapeO()
             centery4 += 1;
         }
     }
-    if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + SPEED + 2][11 - centery2 + 1] == 0))
+    if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + SPEED + 2][17 - centery2 + 1] == 0))
     {
 
         if (centery2 > PINR3)
@@ -311,7 +270,7 @@ void shapeO()
         delay(500);
     }
 
-    if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][11 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3] == 0))
+    if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
     {
 
         turnoffO(centerx);
@@ -322,10 +281,10 @@ void shapeO()
     else
     {
 
-        lightArray[centerx][11 - centery2] = 3;
-        lightArray[centerx + 2][11 - centery2] = 3;
-        lightArray[centerx][11 - centery3] = 3;
-        lightArray[centerx + 2][11 - centery3] = 3;
+        lightArray[centerx][17 - centery2] = 3;
+        lightArray[centerx + 2][17 - centery2] = 3;
+        lightArray[centerx][17 - centery3] = 3;
+        lightArray[centerx + 2][17 - centery3] = 3;
 
         centerx = 0;
         centery1 = PIN;
@@ -357,7 +316,7 @@ void shapeL()
     if (currentL == 0)
     {
         // move left
-        if (currentStateL == HIGH && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery3 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3 - 1] == 0))
         {
 
             if (centery3 < PINL3)
@@ -373,7 +332,7 @@ void shapeL()
             }
         }
         // move right
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 4][11 - centery2 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 4][17 - centery2 + 1] == 0))
         {
 
             if (centery2 > PINR3)
@@ -389,7 +348,7 @@ void shapeL()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (centery2 > PINR3) && (lightArray[centerx + 2][11 - centery2] == 0) && (lightArray[centerx + 2][11 - centery1] == 0))
+        if ((currentRotateState == HIGH) && (centery2 > PINR3) && (lightArray[centerx + 2][17 - centery2] == 0) && (lightArray[centerx + 2][17 - centery1] == 0))
         {
             // turnoff current state
             turnoffL(centerx);
@@ -400,7 +359,7 @@ void shapeL()
     }
     else if (currentL == 1)
     {
-        if (currentStateL == HIGH && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0))
         {
 
             if (centery3 < PINL3)
@@ -415,7 +374,7 @@ void shapeL()
                 centery4 += 1;
             }
         }
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][11 - centery1 + 1] == 0) && (lightArray[centerx + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + SPEED][11 - centery3 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][17 - centery1 + 1] == 0) && (lightArray[centerx + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + SPEED][17 - centery3 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 + 1] == 0))
         {
 
             if (centery1 > PINR3)
@@ -431,7 +390,7 @@ void shapeL()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (lightArray[centerx + 2][11 - centery2] == 0) && (lightArray[centerx + 4][11 - centery2] == 0) && (lightArray[centerx + 6][11 - centery2] == 0))
+        if ((currentRotateState == HIGH) && (lightArray[centerx + 2][17 - centery2] == 0) && (lightArray[centerx + 4][17 - centery2] == 0) && (lightArray[centerx + 6][17 - centery2] == 0))
         {
             // turnoff current state
             turnoffL(centerx);
@@ -442,7 +401,7 @@ void shapeL()
     }
     else if (currentL == 2)
     {
-        if (currentStateL == HIGH && (lightArray[centerx + SPEED][11 - centery2 - 1] == 0) && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2 - 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery2 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + SPEED][17 - centery2 - 1] == 0) && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2 - 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2 - 1] == 0))
         {
 
             if (centery3 < PINL3)
@@ -457,7 +416,7 @@ void shapeL()
                 centery4 += 1;
             }
         }
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery2 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2 + 1] == 0))
         {
 
             if (centery2 > PINR3)
@@ -473,7 +432,7 @@ void shapeL()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (centery2 > PINR3) && (lightArray[centerx + 2][11 - centery1] == 0) && (lightArray[centerx + 4][11 - centery1] == 0) && (lightArray[centerx + 4][11 - centery3] == 0))
+        if ((currentRotateState == HIGH) && (centery2 > PINR3) && (lightArray[centerx + 2][17 - centery1] == 0) && (lightArray[centerx + 4][17 - centery1] == 0) && (lightArray[centerx + 4][17 - centery3] == 0))
         {
             // turnoff current state
             turnoffL(centerx);
@@ -484,7 +443,7 @@ void shapeL()
     }
     else if (currentL == 3)
     {
-        if (currentStateL == HIGH && (lightArray[centerx + 2 + SPEED][11 - centery1 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + 2 + SPEED][17 - centery1 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0))
         {
 
             if (centery3 < PINL3)
@@ -499,7 +458,7 @@ void shapeL()
                 centery4 += 1;
             }
         }
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][11 - centery1 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery1 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][17 - centery1 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery1 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 + 1] == 0))
         {
 
             if (centery1 > PINR3)
@@ -515,7 +474,7 @@ void shapeL()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (lightArray[centerx + 4][11 - centery3] == 0) && (lightArray[centerx + 6][11 - centery3] == 0) && (lightArray[centerx + 6][11 - centery2] == 0))
+        if ((currentRotateState == HIGH) && (lightArray[centerx + 4][17 - centery3] == 0) && (lightArray[centerx + 6][17 - centery3] == 0) && (lightArray[centerx + 6][17 - centery2] == 0))
         {
             // turnoff current state
             turnoffL(centerx);
@@ -538,7 +497,7 @@ void shapeL()
     // 0
     if (currentL == 0)
     {
-        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][11 - centery2] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery3] == 0))
+        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3] == 0))
         {
             turnoffL(centerx);
             centerx = centerx + SPEED;
@@ -546,10 +505,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = 1;
-            lightArray[centerx + 2][11 - centery3] = 1;
-            lightArray[centerx + 4][11 - centery3] = 1;
-            lightArray[centerx + 4][11 - centery2] = 1;
+            lightArray[centerx][17 - centery3] = 1;
+            lightArray[centerx + 2][17 - centery3] = 1;
+            lightArray[centerx + 4][17 - centery3] = 1;
+            lightArray[centerx + 4][17 - centery2] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -565,7 +524,7 @@ void shapeL()
     // 1
     if (currentL == 1)
     {
-        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][11 - centery1] == 0) && (lightArray[centerx + SPEED][11 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3] == 0))
+        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
         {
             turnoffL(centerx);
             centerx = centerx + SPEED;
@@ -573,10 +532,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery1] = 1;
-            lightArray[centerx][11 - centery2] = 1;
-            lightArray[centerx][11 - centery3] = 1;
-            lightArray[centerx + 2][11 - centery3] = 1;
+            lightArray[centerx][17 - centery1] = 1;
+            lightArray[centerx][17 - centery2] = 1;
+            lightArray[centerx][17 - centery3] = 1;
+            lightArray[centerx + 2][17 - centery3] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -591,7 +550,7 @@ void shapeL()
     }
     if (currentL == 2)
     {
-        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + SPEED][11 - centery3] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery2] == 0))
+        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + SPEED][17 - centery3] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0))
         {
             turnoffL(centerx);
             centerx = centerx + SPEED;
@@ -599,10 +558,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = 1;
-            lightArray[centerx][11 - centery2] = 1;
-            lightArray[centerx + 2][11 - centery2] = 1;
-            lightArray[centerx + 4][11 - centery2] = 1;
+            lightArray[centerx][17 - centery3] = 1;
+            lightArray[centerx][17 - centery2] = 1;
+            lightArray[centerx + 2][17 - centery2] = 1;
+            lightArray[centerx + 4][17 - centery2] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -617,7 +576,7 @@ void shapeL()
     }
     if (currentL == 3)
     {
-        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][11 - centery1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3] == 0))
+        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
         {
             turnoffL(centerx);
             centerx = centerx + SPEED;
@@ -625,10 +584,10 @@ void shapeL()
         }
         else
         {
-            lightArray[centerx][11 - centery1] = 1;
-            lightArray[centerx + 2][11 - centery1] = 1;
-            lightArray[centerx + 2][11 - centery2] = 1;
-            lightArray[centerx + 2][11 - centery3] = 1;
+            lightArray[centerx][17 - centery1] = 1;
+            lightArray[centerx + 2][17 - centery1] = 1;
+            lightArray[centerx + 2][17 - centery2] = 1;
+            lightArray[centerx + 2][17 - centery3] = 1;
 
             centerx = 0;
             centery1 = PIN;
@@ -660,7 +619,7 @@ void shapeZ()
     SpeedUp = digitalRead(BUTTON_SPEEDUP);
     if (currentZ == 0)
     {
-        if (currentStateL == HIGH && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2 - 1] == 0))
         {
 
             if (centery3 < PINL3)
@@ -675,7 +634,7 @@ void shapeZ()
                 centery4 += 1;
             }
         }
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][11 - centery2 + 1] == 0) && (lightArray[centerx + SPEED + 4][11 - centery2 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][17 - centery2 + 1] == 0) && (lightArray[centerx + SPEED + 4][17 - centery2 + 1] == 0))
         {
             // clear(centerx-SPEED);
             if (centery2 > PINR3)
@@ -691,7 +650,7 @@ void shapeZ()
             }
         }
 
-        if ((currentRotateState == HIGH) && (centery2 > PINR3) && (lightArray[centerx + 4][11 - centery3] == 0) && (lightArray[centerx + 2][11 - centery1] == 0))
+        if ((currentRotateState == HIGH) && (centery2 > PINR3) && (lightArray[centerx + 4][17 - centery3] == 0) && (lightArray[centerx + 2][17 - centery1] == 0))
         {
             // turnoff current state
             turnoffZ(centerx);
@@ -702,7 +661,7 @@ void shapeZ()
     }
     else if (currentZ == 1)
     {
-        if (currentStateL == HIGH && (lightArray[centerx + 2 + SPEED][11 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + 2 + SPEED][17 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0))
         {
 
             if (centery3 < PINL3)
@@ -717,7 +676,7 @@ void shapeZ()
                 centery4 += 1;
             }
         }
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 2][11 - centery2 + 1] == 0) && (lightArray[centerx + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + SPEED][11 - centery1 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 2][17 - centery2 + 1] == 0) && (lightArray[centerx + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + SPEED][17 - centery1 + 1] == 0))
         {
             // clear(centerx-SPEED);
             if (centery1 > PINR3)
@@ -733,7 +692,7 @@ void shapeZ()
             }
         }
 
-        if ((currentRotateState == HIGH) && (lightArray[centerx + 4][11 - centery3] == 0) && (lightArray[centerx + 4][11 - centery2] == 0) && (lightArray[centerx + 6][11 - centery2] == 0))
+        if ((currentRotateState == HIGH) && (lightArray[centerx + 4][17 - centery3] == 0) && (lightArray[centerx + 4][17 - centery2] == 0) && (lightArray[centerx + 6][17 - centery2] == 0))
         {
             // turnoff current state
             turnoffZ(centerx);
@@ -753,7 +712,7 @@ void shapeZ()
     }
     if (currentZ == 0)
     {
-        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][11 - centery2] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery3] != 1))
+        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
         {
 
             turnoffZ(centerx);
@@ -764,10 +723,10 @@ void shapeZ()
         else
         {
 
-            lightArray[centerx + 2][11 - centery2] = 4;
-            lightArray[centerx + 4][11 - centery2] = 4;
-            lightArray[centerx][11 - centery3] = 4;
-            lightArray[centerx + 2][11 - centery3] = 4;
+            lightArray[centerx + 2][17 - centery2] = 4;
+            lightArray[centerx + 4][17 - centery2] = 4;
+            lightArray[centerx][17 - centery3] = 4;
+            lightArray[centerx + 2][17 - centery3] = 4;
 
             centerx = 0;
             centery1 = PIN;
@@ -782,7 +741,7 @@ void shapeZ()
     }
     if (currentZ == 1)
     {
-        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][11 - centery1] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery2] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery3] != 1))
+        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
         {
 
             turnoffZ(centerx);
@@ -793,10 +752,10 @@ void shapeZ()
         else
         {
 
-            lightArray[centerx + 2][11 - centery3] = 4;
-            lightArray[centerx][11 - centery2] = 4;
-            lightArray[centerx + 2][11 - centery2] = 4;
-            lightArray[centerx][11 - centery1] = 4;
+            lightArray[centerx + 2][17 - centery3] = 4;
+            lightArray[centerx][17 - centery2] = 4;
+            lightArray[centerx + 2][17 - centery2] = 4;
+            lightArray[centerx][17 - centery1] = 4;
 
             centerx = 0;
             centery1 = PIN;
@@ -828,7 +787,7 @@ void shapeT()
     if (currentT == 0)
     {
         // move left
-        if ((currentStateL == HIGH) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery2 - 1] == 0))
+        if ((currentStateL == HIGH) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2 - 1] == 0))
         {
             if (centery3 < PINL3)
             {
@@ -839,7 +798,7 @@ void shapeT()
             }
         }
         // move right
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery2 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2 + 1] == 0))
         {
             if (centery2 > PINR3)
             {
@@ -850,7 +809,7 @@ void shapeT()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (centery3 < PINL3) && (lightArray[centerx + 4][11 - centery3] == 0) && (lightArray[centerx + 4][11 - centery4] == 0))
+        if ((currentRotateState == HIGH) && (centery3 < PINL3) && (lightArray[centerx + 4][17 - centery3] == 0) && (lightArray[centerx + 4][17 - centery4] == 0))
         {
             // turnoff current state
             turnoffT(centerx);
@@ -862,7 +821,7 @@ void shapeT()
     else if (currentT == 1)
     {
         // move left
-        if ((currentStateL == HIGH) && (lightArray[centerx + 2 + SPEED][11 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery4 - 1] == 0))
+        if ((currentStateL == HIGH) && (lightArray[centerx + 2 + SPEED][17 - centery2 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery4 - 1] == 0))
         {
             if (centery4 < PINL3)
             {
@@ -873,7 +832,7 @@ void shapeT()
             }
         }
         // move right
-        if ((currentStateR == HIGH) && (lightArray[centerx + 2 + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery4 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + 2 + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery4 + 1] == 0))
         {
             if (centery2 > PINR3)
             {
@@ -884,7 +843,7 @@ void shapeT()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (lightArray[centerx + 4][11 - centery3] == 0) && (lightArray[centerx + 4][11 - centery2] == 0) && (lightArray[centerx + 6][11 - centery3] == 0))
+        if ((currentRotateState == HIGH) && (lightArray[centerx + 4][17 - centery3] == 0) && (lightArray[centerx + 4][17 - centery2] == 0) && (lightArray[centerx + 6][17 - centery3] == 0))
         {
             // turnoff current state
             turnoffT(centerx);
@@ -896,7 +855,7 @@ void shapeT()
     else if (currentT == 2)
     {
         // move left
-        if ((currentStateL == HIGH) && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery3 - 1] == 0))
+        if ((currentStateL == HIGH) && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3 - 1] == 0))
         {
             if (centery3 < PINL3)
             {
@@ -907,7 +866,7 @@ void shapeT()
             }
         }
         // move right
-        if ((currentStateR == HIGH) && (lightArray[centerx + 2 + SPEED][11 - centery3 + 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery3 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery2 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + 2 + SPEED][17 - centery3 + 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2 + 1] == 0))
         {
             if (centery2 > PINR3)
             {
@@ -918,7 +877,7 @@ void shapeT()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (centery3 < PINL3) && (lightArray[centerx + 2][11 - centery4] == 0))
+        if ((currentRotateState == HIGH) && (centery3 < PINL3) && (lightArray[centerx + 2][17 - centery4] == 0))
         {
             // turnoff current state
             turnoffT(centerx);
@@ -930,7 +889,7 @@ void shapeT()
     else if (currentT == 3)
     {
         // move left
-        if ((currentStateL == HIGH) && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + SPEED][11 - centery4 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0))
+        if ((currentStateL == HIGH) && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + SPEED][17 - centery4 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0))
         {
             if (centery4 < PINL3)
             {
@@ -941,7 +900,7 @@ void shapeT()
             }
         }
         // move right
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED][11 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED][17 - centery2 + 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 + 1] == 0))
         {
             if (centery2 > PINR3)
             {
@@ -952,7 +911,7 @@ void shapeT()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (lightArray[centerx + 2][11 - centery2] == 0) && (lightArray[centerx + 4][11 - centery2] == 0) && (lightArray[centerx + 6][11 - centery2] == 0) && (lightArray[centerx + 4][11 - centery3] == 0))
+        if ((currentRotateState == HIGH) && (lightArray[centerx + 2][17 - centery2] == 0) && (lightArray[centerx + 4][17 - centery2] == 0) && (lightArray[centerx + 6][17 - centery2] == 0) && (lightArray[centerx + 4][17 - centery3] == 0))
         {
             // turnoff current state
             turnoffT(centerx);
@@ -973,7 +932,7 @@ void shapeT()
     }
     if (currentT == 0)
     {
-        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][11 - centery2] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery3] != 1))
+        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
         {
             turnoffT(centerx);
             centerx = centerx + SPEED;
@@ -981,10 +940,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery2] = 5;
-            lightArray[centerx + 2][11 - centery2] = 5;
-            lightArray[centerx + 4][11 - centery2] = 5;
-            lightArray[centerx + 2][11 - centery3] = 5;
+            lightArray[centerx][17 - centery2] = 5;
+            lightArray[centerx + 2][17 - centery2] = 5;
+            lightArray[centerx + 4][17 - centery2] = 5;
+            lightArray[centerx + 2][17 - centery3] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -998,7 +957,7 @@ void shapeT()
     }
     if (currentT == 1)
     {
-        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][11 - centery2] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery3] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery4] != 1))
+        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery4] == 0))
         {
             turnoffT(centerx);
             centerx = centerx + SPEED;
@@ -1006,10 +965,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = 5;
-            lightArray[centerx + 2][11 - centery2] = 5;
-            lightArray[centerx + 2][11 - centery3] = 5;
-            lightArray[centerx + 2][11 - centery4] = 5;
+            lightArray[centerx][17 - centery3] = 5;
+            lightArray[centerx + 2][17 - centery2] = 5;
+            lightArray[centerx + 2][17 - centery3] = 5;
+            lightArray[centerx + 2][17 - centery4] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -1023,7 +982,7 @@ void shapeT()
     }
     if (currentT == 2)
     {
-        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][11 - centery3] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery2] != 1))
+        if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery3] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0))
         {
             turnoffT(centerx);
             centerx = centerx + SPEED;
@@ -1031,10 +990,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery3] = 5;
-            lightArray[centerx + 2][11 - centery3] = 5;
-            lightArray[centerx + 4][11 - centery3] = 5;
-            lightArray[centerx + 2][11 - centery2] = 5;
+            lightArray[centerx][17 - centery3] = 5;
+            lightArray[centerx + 2][17 - centery3] = 5;
+            lightArray[centerx + 4][17 - centery3] = 5;
+            lightArray[centerx + 2][17 - centery2] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -1048,7 +1007,7 @@ void shapeT()
     }
     if (currentT == 3)
     {
-        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][11 - centery2] != 1) && (lightArray[centerx + 2 + SPEED][11 - centery3] != 1) && (lightArray[centerx + SPEED][11 - centery4] != 1))
+        if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0) && (lightArray[centerx + SPEED][17 - centery4] == 0))
         {
             turnoffT(centerx);
             centerx = centerx + SPEED;
@@ -1056,10 +1015,10 @@ void shapeT()
         }
         else
         {
-            lightArray[centerx][11 - centery2] = 5;
-            lightArray[centerx][11 - centery3] = 5;
-            lightArray[centerx][11 - centery4] = 5;
-            lightArray[centerx + 2][11 - centery3] = 5;
+            lightArray[centerx][17 - centery2] = 5;
+            lightArray[centerx][17 - centery3] = 5;
+            lightArray[centerx][17 - centery4] = 5;
+            lightArray[centerx + 2][17 - centery3] = 5;
             centerx = 0;
             centery1 = PIN;
             centery2 = PIN2;
@@ -1091,7 +1050,7 @@ void shapeI()
 
     if (currentI == 0)
     {
-        if (currentStateL == HIGH && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + 6 + SPEED][11 - centery3 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 6 + SPEED][17 - centery3 - 1] == 0))
         {
             if (centery3 < PINL3)
             {
@@ -1105,7 +1064,7 @@ void shapeI()
                 centery4 += 1;
             }
         }
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 4][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][11 - centery3 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 4][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][17 - centery3 + 1] == 0))
         {
             if (centery3 > PINR3)
             {
@@ -1120,7 +1079,7 @@ void shapeI()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (centery3 > PINR2) && (centery3 < PINL3) && (lightArray[centerx + 2][11 - centery4] == 0) && (lightArray[centerx + 2][11 - centery2] == 0) && (lightArray[centerx + 2][11 - centery1] == 0))
+        if ((currentRotateState == HIGH) && (centery3 > PINR2) && (centery3 < PINL3) && (lightArray[centerx + 2][17 - centery4] == 0) && (lightArray[centerx + 2][17 - centery2] == 0) && (lightArray[centerx + 2][17 - centery1] == 0))
         {
             // turnoff current state
             turnoffI(centerx);
@@ -1131,7 +1090,7 @@ void shapeI()
     }
     else if (currentI == 1)
     {
-        if (currentStateL == HIGH && (lightArray[centerx + SPEED][11 - centery1 - 1] == 0) && (lightArray[centerx + SPEED][11 - centery2 - 1] == 0) && (lightArray[centerx + SPEED][11 - centery3 - 1] == 0) && (lightArray[centerx + SPEED][11 - centery4 - 1] == 0))
+        if (currentStateL == HIGH && (lightArray[centerx + SPEED][17 - centery1 - 1] == 0) && (lightArray[centerx + SPEED][17 - centery2 - 1] == 0) && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + SPEED][17 - centery4 - 1] == 0))
         {
             if (centery4 < PINL3)
             {
@@ -1145,7 +1104,7 @@ void shapeI()
                 centery4 += 1;
             }
         }
-        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 4][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][11 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][11 - centery3 + 1] == 0))
+        if ((currentStateR == HIGH) && (lightArray[centerx + SPEED + 2][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 4][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][17 - centery3 + 1] == 0) && (lightArray[centerx + SPEED + 6][17 - centery3 + 1] == 0))
         {
             if (centery1 > PINR3)
             {
@@ -1160,7 +1119,7 @@ void shapeI()
             }
         }
         // rotate
-        if ((currentRotateState == HIGH) && (lightArray[centerx + 2][11 - centery3] == 0) && (lightArray[centerx + 4][11 - centery3] == 0) && (lightArray[centerx + 6][11 - centery3] == 0))
+        if ((currentRotateState == HIGH) && (lightArray[centerx + 2][17 - centery3] == 0) && (lightArray[centerx + 4][17 - centery3] == 0) && (lightArray[centerx + 6][17 - centery3] == 0))
         {
             // turnoff current state
             turnoffI(centerx);
@@ -1182,7 +1141,7 @@ void shapeI()
 
     if (currentI == 0)
     {
-        if ((centerx < NUMPIXELS - 8) && (lightArray[centerx + 6 + SPEED][11 - centery3] != 1))
+        if ((centerx < NUMPIXELS - 8) && (lightArray[centerx + 6 + SPEED][17 - centery3] == 0))
         {
 
             turnoffI(centerx);
@@ -1193,10 +1152,10 @@ void shapeI()
         else
         {
 
-            lightArray[centerx][11 - centery3] = 2;
-            lightArray[centerx + 2][11 - centery3] = 2;
-            lightArray[centerx + 4][11 - centery3] = 2;
-            lightArray[centerx + 6][11 - centery3] = 2;
+            lightArray[centerx][17 - centery3] = 2;
+            lightArray[centerx + 2][17 - centery3] = 2;
+            lightArray[centerx + 4][17 - centery3] = 2;
+            lightArray[centerx + 6][17 - centery3] = 2;
 
             centerx = 0;
             centery1 = PIN;
@@ -1211,7 +1170,7 @@ void shapeI()
     }
     if (currentI == 1)
     {
-        if ((centerx < NUMPIXELS) && (lightArray[centerx + SPEED][11 - centery1] != 1) && (lightArray[centerx + SPEED][11 - centery2] != 1) && (lightArray[centerx + SPEED][11 - centery3] != 1) && (lightArray[centerx + SPEED][11 - centery4] != 1))
+        if ((centerx < NUMPIXELS) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + SPEED][17 - centery3] == 0) && (lightArray[centerx + SPEED][17 - centery4] == 0))
         {
 
             turnoffI(centerx);
@@ -1222,10 +1181,10 @@ void shapeI()
         else
         {
 
-            lightArray[centerx][11 - centery1] = 2;
-            lightArray[centerx][11 - centery2] = 2;
-            lightArray[centerx][11 - centery3] = 2;
-            lightArray[centerx][11 - centery4] = 2;
+            lightArray[centerx][17 - centery1] = 2;
+            lightArray[centerx][17 - centery2] = 2;
+            lightArray[centerx][17 - centery3] = 2;
+            lightArray[centerx][17 - centery4] = 2;
 
             centerx = 0;
             centery1 = PIN;
@@ -1283,7 +1242,7 @@ void arrayLight()
     {
         for (int j = 0; j < 10; j++)
         {
-            switch (11 - j)
+            switch (17 - j)
             {
             case PIN:
                 col1.setPixelColor(i, col1.Color(0, 0, 0));
@@ -1318,7 +1277,7 @@ void arrayLight()
             }
             if (lightArray[i][j] == 1)
             {
-                switch (11 - j)
+                switch (17 - j)
                 {
                 case PIN:
                     col1.setPixelColor(i, col1.Color(220, 0, 0));
@@ -1354,7 +1313,7 @@ void arrayLight()
             }
             if (lightArray[i][j] == 2)
             {
-                switch (11 - j)
+                switch (17 - j)
                 {
                 case PIN:
                     col1.setPixelColor(i, col1.Color(0, 0, 255));
@@ -1390,7 +1349,7 @@ void arrayLight()
             }
             if (lightArray[i][j] == 3)
             {
-                switch (11 - j)
+                switch (17 - j)
                 {
                 case PIN:
                     col1.setPixelColor(i, col1.Color(0, 128, 0));
@@ -1426,7 +1385,7 @@ void arrayLight()
             }
             if (lightArray[i][j] == 4)
             {
-                switch (11 - j)
+                switch (17 - j)
                 {
                 case PIN:
                     col1.setPixelColor(i, col1.Color(255, 255, 0));
@@ -1462,7 +1421,7 @@ void arrayLight()
             }
             if (lightArray[i][j] == 5)
             {
-                switch (11 - j)
+                switch (17 - j)
                 {
                 case PIN:
                     col1.setPixelColor(i, col1.Color(255, 0, 255));
