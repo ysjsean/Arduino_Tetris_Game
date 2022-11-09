@@ -68,14 +68,13 @@ Colors colorO = Colors::GREEN;
 Colors colorZ = Colors::YELLOW;
 Colors colorT = Colors::PURPLE;
 
-#define DELAYVAL 500 // Time (in milliseconds) to pause between pixels
 int centerx = 0;
 int centery1 = PIN;
 int centery2 = PIN_2;
 int centery3 = PIN_3;
 int centery4 = PIN_4;
 int highestScore = 0;
-
+int DelayVal = 500; // Time (in milliseconds) to pause between pixels
 // centery1b=centery1before
 int centery1b = PIN;
 int centery2b = PIN_2;
@@ -148,7 +147,7 @@ enum State
 static const char wav_addPoint[] PROGMEM = "point22.wav";
 static const char wav_gameOver[] PROGMEM = "go3.wav";
 static const char wav_backGround[] PROGMEM = "bgm1.wav";
-static const char wav_menu[] PROGMEM = "menu.wav";
+static const char wav_menu[] PROGMEM = "tetris5.wav";
 
 const char *wav_table[] = {
     wav_addPoint,
@@ -267,6 +266,9 @@ void loop()
         }
         isGameOver = false;
 
+        SpeedUp = digitalRead(BUTTON_SPEEDUP);
+        updateSpeed();
+
         randomShape(randNumber);
     }
     audioControl();
@@ -323,11 +325,13 @@ void initGame()
         colPR.setPixelColor(i, Colors::WHITE);
     }
     showCol();
+    showNextTileCol();
 }
 
 void startGame()
 {
     audio_state = stop_all;
+    DelayVal = 500;
 
     for (int i = 0; i < 38; i += 2)
     {
@@ -458,13 +462,49 @@ void displayNextTile()
     showNextTileCol();
 }
 
+void updateSpeed()
+{
+    // Change Speed
+    if (SpeedUp == LOW)
+    {
+        if (DelayVal - 300 > 0)
+        {
+            delay(DelayVal - 300);
+        }
+        else
+        {
+            delay(DelayVal);
+        }
+    }
+    else
+    {
+        delay(DelayVal);
+    }
+}
+
+void updateScore()
+{
+    score += 1;
+    if (score == 4)
+    {
+        DelayVal -= 50;
+    }
+    else if (score >= 8)
+    {
+        if (DelayVal - 40 >= 10)
+        {
+            DelayVal -= 40;
+        }
+    }
+}
+
 void randomShape(int currentShape)
 {
     bool isGameOver = false;
     switch (currentShape)
     {
     case 0:
-        if (lightArray[1][4] == 0 && lightArray[1][5] == 0)
+        if (lightArray[2][4] == 0 && lightArray[2][5] == 0 && lightArray[0][0] == 0 && lightArray[0][1] == 0 && lightArray[0][2] == 0 && lightArray[0][3] == 0 && lightArray[0][6] == 0 && lightArray[0][7] == 0 && lightArray[0][8] == 0 && lightArray[0][9] == 0)
         {
             shapeO();
         }
@@ -475,7 +515,7 @@ void randomShape(int currentShape)
 
         break;
     case 1:
-        if ((lightArray[0][5] == 0) && (lightArray[1][4] == 0 && lightArray[1][5] == 0) && (lightArray[2][4] == 0))
+        if ((lightArray[0][5] == 0) && lightArray[2][4] == 0 && lightArray[2][5] == 0 && lightArray[4][4] == 0 && lightArray[0][0] == 0 && lightArray[0][1] == 0 && lightArray[0][2] == 0 && lightArray[0][3] == 0 && lightArray[0][6] == 0 && lightArray[0][7] == 0 && lightArray[0][8] == 0 && lightArray[0][9] == 0)
         {
             shapeZ();
         }
@@ -486,7 +526,7 @@ void randomShape(int currentShape)
 
         break;
     case 2:
-        if ((lightArray[0][5] == 0) && (lightArray[1][5] == 0) && (lightArray[2][5] == 0 && lightArray[2][4] == 0))
+        if (lightArray[0][5] == 0 && lightArray[2][5] == 0 && lightArray[4][5] == 0 && lightArray[4][4] == 0 && lightArray[0][0] == 0 && lightArray[0][1] == 0 && lightArray[0][2] == 0 && lightArray[0][3] == 0 && lightArray[0][6] == 0 && lightArray[0][7] == 0 && lightArray[0][8] == 0 && lightArray[0][9] == 0)
         {
             shapeL();
         }
@@ -497,7 +537,7 @@ void randomShape(int currentShape)
 
         break;
     case 3:
-        if (lightArray[0][4] == 0 && (lightArray[1][4] == 0 && lightArray[1][5] == 0) || (lightArray[2][4] == 0))
+        if (lightArray[0][4] == 0 && lightArray[2][4] == 0 && lightArray[2][5] == 0 && lightArray[4][4] == 0 && lightArray[0][0] == 0 && lightArray[0][1] == 0 && lightArray[0][2] == 0 && lightArray[0][3] == 0 && lightArray[0][6] == 0 && lightArray[0][7] == 0 && lightArray[0][8] == 0 && lightArray[0][9] == 0)
         {
             shapeT();
         }
@@ -508,7 +548,7 @@ void randomShape(int currentShape)
 
         break;
     case 4:
-        if ((lightArray[0][5] == 0) && lightArray[1][5] == 0 && lightArray[2][5] == 0 && lightArray[3][5] == 0)
+        if (lightArray[0][5] == 0 && lightArray[2][5] == 0 && lightArray[4][5] == 0 && lightArray[6][5] == 0 && lightArray[0][0] == 0 && lightArray[0][1] == 0 && lightArray[0][2] == 0 && lightArray[0][3] == 0 && lightArray[0][6] == 0 && lightArray[0][7] == 0 && lightArray[0][8] == 0 && lightArray[0][9] == 0)
         {
             shapeI();
         }
@@ -552,6 +592,7 @@ void endGame()
     {
         highestScore = score;
     }
+
     isGameStarted = false;
     isGameOver = true;
 }
@@ -567,7 +608,7 @@ void shapeO()
 
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
-    SpeedUp = digitalRead(BUTTON_SPEEDUP);
+
     currentStateDrop = digitalRead(BUTTON_DROP);
 
     if (currentStateL == LOW && (lightArray[centerx + SPEED][17 - centery3 - 1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3 - 1] == 0))
@@ -600,15 +641,22 @@ void shapeO()
             centery4 -= 1;
         }
     }
-    // Change Speed
-    if (SpeedUp == LOW)
-    {
-        delay(100);
-    }
-    else
-    {
-        delay(500);
-    }
+    // Change Speed (Called in the void loop)
+    // if (SpeedUp == LOW)
+    // {
+    //     if (DelayVal - 300 > 0)
+    //     {
+    //         delay(DelayVal - 300);
+    //     }
+    //     else
+    //     {
+    //         delay(DelayVal);
+    //     }
+    // }
+    // else
+    // {
+    //     delay(DelayVal);
+    // }
     if (currentStateDrop == LOW)
     {
         turnoffO(centerx);
@@ -680,7 +728,7 @@ void shapeL()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE); //记录是否按下rotate button
-    SpeedUp = digitalRead(BUTTON_SPEEDUP);
+    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
     currentStateDrop = digitalRead(BUTTON_DROP);
     // need to add more conditions 不同形态的
     if (currentL == 0)
@@ -853,15 +901,22 @@ void shapeL()
             lightL(centerx);
         }
     }
-    // Change Speed
-    if (SpeedUp == LOW)
-    {
-        delay(100);
-    }
-    else
-    {
-        delay(500);
-    }
+    // Change Speed (called in void loop)
+    // if (SpeedUp == LOW)
+    // {
+    //     if (DelayVal - 300 > 0)
+    //     {
+    //         delay(DelayVal - 300);
+    //     }
+    //     else
+    //     {
+    //         delay(DelayVal);
+    //     }
+    // }
+    // else
+    // {
+    //     delay(DelayVal);
+    // }
     // Drop
     // need to add more conditions 不同形态
     // 0
@@ -1099,7 +1154,7 @@ void shapeZ()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE);
-    SpeedUp = digitalRead(BUTTON_SPEEDUP);
+    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
     currentStateDrop = digitalRead(BUTTON_DROP);
 
     if (currentZ == 0)
@@ -1187,14 +1242,21 @@ void shapeZ()
         }
     }
 
-    if (SpeedUp == LOW)
-    {
-        delay(100);
-    }
-    else
-    {
-        delay(500);
-    }
+    // if (SpeedUp == LOW)
+    // {
+    //     if (DelayVal - 300 > 0)
+    //     {
+    //         delay(DelayVal - 300);
+    //     }
+    //     else
+    //     {
+    //         delay(DelayVal);
+    //     }
+    // }
+    // else
+    // {
+    //     delay(DelayVal);
+    // }
     if (currentZ == 0)
     {
         if (currentStateDrop == LOW)
@@ -1323,7 +1385,7 @@ void shapeT()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE);
-    SpeedUp = digitalRead(BUTTON_SPEEDUP);
+    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
     currentStateDrop = digitalRead(BUTTON_DROP);
 
     if (currentT == 0)
@@ -1464,14 +1526,21 @@ void shapeT()
     }
 
     // Change Speed
-    if (SpeedUp == LOW)
-    {
-        delay(100);
-    }
-    else
-    {
-        delay(500);
-    }
+    // if (SpeedUp == LOW)
+    // {
+    //     if (DelayVal - 300 > 0)
+    //     {
+    //         delay(DelayVal - 300);
+    //     }
+    //     else
+    //     {
+    //         delay(DelayVal);
+    //     }
+    // }
+    // else
+    // {
+    //     delay(DelayVal);
+    // }
     if (currentT == 0)
     {
         if (currentStateDrop == LOW)
@@ -1700,7 +1769,7 @@ void shapeI()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE);
-    SpeedUp = digitalRead(BUTTON_SPEEDUP);
+    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
     currentStateDrop = digitalRead(BUTTON_DROP);
 
     if (currentI == 0)
@@ -1785,14 +1854,21 @@ void shapeI()
     }
 
     // Change Speed
-    if (SpeedUp == LOW)
-    {
-        delay(100);
-    }
-    else
-    {
-        delay(500);
-    }
+    // if (SpeedUp == LOW)
+    // {
+    //     if (DelayVal - 300 > 0)
+    //     {
+    //         delay(DelayVal - 300);
+    //     }
+    //     else
+    //     {
+    //         delay(DelayVal);
+    //     }
+    // }
+    // else
+    // {
+    //     delay(DelayVal);
+    // }
 
     if (currentI == 0)
     {
@@ -1917,6 +1993,27 @@ void checkLine()
     audioControl();
     bool playAudioOnce = false;
     int product = 1;
+
+    int productArray[38];
+    for (int i = 0; i < 38; i = i + 1)
+    {
+        productArray[i] = 0;
+    }
+
+    for (int i = 36; i > 0; i = i - 2)
+    {
+        product = 1;
+        for (int j = 0; j < 10; j = j + 1)
+        {
+            product = product * lightArray[i][j];
+        }
+        if (product != 0)
+        {
+            productArray[i] = product;
+        }
+    }
+    blink(productArray);
+
     for (int i = 36; i > 0; i = i - 2)
     {
         product = 1;
@@ -1927,7 +2024,7 @@ void checkLine()
 
         if (product != 0)
         {
-            score += 1;
+            updateScore();
             if (!playAudioOnce)
             {
                 audio_state = add_point;
@@ -1936,7 +2033,7 @@ void checkLine()
             }
 
             // delay(10);
-            blink(i);
+            // blink(i);
             arrayUpdate(i);
             // blink(i);
             i = i + 2;
@@ -1946,41 +2043,41 @@ void checkLine()
     audioControl();
     arrayLight();
 }
-void blink(int line)
+void blink(int productArray[])
 {
-    // unsigned long previousMillis = 0;  // will store last time LED was updated
-    // const long interval = 50;  // interval at which to blink (milliseconds)
-    // unsigned long currentMillis = millis();
-    //  if(currentMillis - previousMillis >= interval){
-    //    previousMillis = currentMillis;
-    //  }
-    for (int i = 0; i < 4; i++)
+    for (int blinktime = 0; blinktime < 4; blinktime++)
     {
-        if (i % 2 == 0)
+        for (int i = 0; i < 38; i = i + 2)
         {
-            col1.setPixelColor(line, Colors::BLACK);
-            col2.setPixelColor(line, Colors::BLACK);
-            col3.setPixelColor(line, Colors::BLACK);
-            col4.setPixelColor(line, Colors::BLACK);
-            colL1.setPixelColor(line, Colors::BLACK);
-            colL2.setPixelColor(line, Colors::BLACK);
-            colL3.setPixelColor(line, Colors::BLACK);
-            colR1.setPixelColor(line, Colors::BLACK);
-            colR2.setPixelColor(line, Colors::BLACK);
-            colR3.setPixelColor(line, Colors::BLACK);
-        }
-        else
-        {
-            col1.setPixelColor(line, Colors::WHITE);
-            col2.setPixelColor(line, Colors::WHITE);
-            col3.setPixelColor(line, Colors::WHITE);
-            col4.setPixelColor(line, Colors::WHITE);
-            colL1.setPixelColor(line, Colors::WHITE);
-            colL2.setPixelColor(line, Colors::WHITE);
-            colL3.setPixelColor(line, Colors::WHITE);
-            colR1.setPixelColor(line, Colors::WHITE);
-            colR2.setPixelColor(line, Colors::WHITE);
-            colR3.setPixelColor(line, Colors::WHITE);
+            if (productArray[i] != 0)
+            {
+                if (blinktime % 2 == 0)
+                {
+                    col1.setPixelColor(i, Colors::BLACK);
+                    col2.setPixelColor(i, Colors::BLACK);
+                    col3.setPixelColor(i, Colors::BLACK);
+                    col4.setPixelColor(i, Colors::BLACK);
+                    colL1.setPixelColor(i, Colors::BLACK);
+                    colL2.setPixelColor(i, Colors::BLACK);
+                    colL3.setPixelColor(i, Colors::BLACK);
+                    colR1.setPixelColor(i, Colors::BLACK);
+                    colR2.setPixelColor(i, Colors::BLACK);
+                    colR3.setPixelColor(i, Colors::BLACK);
+                }
+                else
+                {
+                    col1.setPixelColor(i, Colors::WHITE);
+                    col2.setPixelColor(i, Colors::WHITE);
+                    col3.setPixelColor(i, Colors::WHITE);
+                    col4.setPixelColor(i, Colors::WHITE);
+                    colL1.setPixelColor(i, Colors::WHITE);
+                    colL2.setPixelColor(i, Colors::WHITE);
+                    colL3.setPixelColor(i, Colors::WHITE);
+                    colR1.setPixelColor(i, Colors::WHITE);
+                    colR2.setPixelColor(i, Colors::WHITE);
+                    colR3.setPixelColor(i, Colors::WHITE);
+                }
+            }
         }
         showCol();
     }
@@ -3065,7 +3162,14 @@ void turnoffI(int centerx)
             colR2.setPixelColor(centerx, Colors::BLACK);
             colR2.setPixelColor(centerx + 2, Colors::BLACK);
             colR2.setPixelColor(centerx + 4, Colors::BLACK);
+            colR2.setPixelColor(centerx + 6, Colors::BLACK);
+
+            break;
+        case PIN_RIGHT3 - 2:
+            colR2.setPixelColor(centerx, Colors::BLACK);
             colR2.setPixelColor(centerx + 2, Colors::BLACK);
+            colR2.setPixelColor(centerx + 4, Colors::BLACK);
+            colR2.setPixelColor(centerx + 6, Colors::BLACK);
 
             break;
         }
@@ -3958,7 +4062,14 @@ void lightI(int centerx)
             colR2.setPixelColor(centerx, colorI);
             colR2.setPixelColor(centerx + 2, colorI);
             colR2.setPixelColor(centerx + 4, colorI);
-            colR2.setPixelColor(centerx + 2, colorI);
+            colR2.setPixelColor(centerx + 6, colorI);
+
+            break;
+        case PIN_RIGHT3 - 2:
+            colR3.setPixelColor(centerx, colorI);
+            colR3.setPixelColor(centerx + 2, colorI);
+            colR3.setPixelColor(centerx + 4, colorI);
+            colR3.setPixelColor(centerx + 6, colorI);
 
             break;
         }
