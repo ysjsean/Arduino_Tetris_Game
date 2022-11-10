@@ -128,6 +128,8 @@ int incomingByte = 0;
 bool isGameStarted = false;
 bool isGameOver = false;
 
+int count_duplicate = 0;
+
 TMRpcm audio; // create an object for use in this sketch
 
 enum State
@@ -314,6 +316,7 @@ void startGame()
 {
     audio_state = stop_all;
     DelayVal = 500;
+    count_duplicate = 0;
 
     for (int i = 0; i < 38; i += 2)
     {
@@ -408,7 +411,19 @@ void generateNumber()
         randNumber = randNumberNext;
     }
 
-    randNumberNext = random(0, 5);
+    do
+    {
+        randNumberNext = random(0, 5);
+        if (randNumber == randNumberNext)
+        {
+            count_duplicate++;
+        }
+        if (randNumber != randNumberNext)
+        {
+            count_duplicate = 0;
+        }
+    } while (count_duplicate >= 2);
+
     displayNextTile();
 }
 
