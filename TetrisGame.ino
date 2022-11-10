@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include <TMRpcm.h>
 #include <Beacon.h>
+#include <toneAC.h>
 
 #ifdef __AVR__
 #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
@@ -30,6 +31,7 @@
 #define PINPRER A7
 
 #define SD_ChipSelectPin 53 // example uses hardware SS pin 53 on Mega2560
+#define buzzer 6
 
 Adafruit_NeoPixel col1(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel col2(NUMPIXELS, PIN_2, NEO_GRB + NEO_KHZ800);
@@ -87,7 +89,7 @@ int currentRotateState;
 int SpeedUp;
 int currentStateStart;
 int currentStateDrop;
-// bool lightArray[38][10];//record the light pixel
+
 int lightArray[38][10]; // record the light pixel
 bool currentLanded = true;
 long currentShape = -1;
@@ -104,7 +106,6 @@ const int tens_score_pin[] = {29, 30, 31, 32, 33, 34, 35};
 
 const int ones_highscore_pin[] = {36, 37, 38, 39, 40, 41, 42};
 const int tens_highscore_pin[] = {43, 44, 45, 46, 47, 48, 49};
-//#define button 10
 
 uint8_t current_button_state;
 uint8_t previous_button_state;
@@ -134,8 +135,6 @@ enum State
     game_over,
     add_point,
     background,
-    menu,
-    stop_sound,
     increase,
     decrease,
     mute_bg,
@@ -144,16 +143,12 @@ enum State
     default_null
 } audio_state;
 
-static const char wav_addPoint[] PROGMEM = "point22.wav";
 static const char wav_gameOver[] PROGMEM = "go3.wav";
 static const char wav_backGround[] PROGMEM = "bgm1.wav";
-static const char wav_menu[] PROGMEM = "tetris5.wav";
 
 const char *wav_table[] = {
-    wav_addPoint,
     wav_gameOver,
     wav_backGround,
-    wav_menu,
 };
 
 void setup()
@@ -173,9 +168,6 @@ void setup()
 
     */
     randomSeed(analogRead(0));
-    // randNumber = random(0, 5);
-    //  new add random
-    // randNumberNext = random(0, 5);
 
     for (int i = 0; i < 38; i++)
     {
@@ -197,8 +189,7 @@ void setup()
     audio.speakerPin = 5; // 5,6,11 or 46 on Mega, 9 on Uno, Nano, etc
     pinMode(2, OUTPUT);   // Pin pairs: 9,10 Mega: 5-2,6-7,11-12,46-45
 
-    audio.speakerPin2 = 6; // Enable the second set of timer pins
-    pinMode(7, OUTPUT);
+    pinMode(buzzer, OUTPUT);
 
     audio.setVolume(3);
     audio.quality(1);
@@ -213,7 +204,6 @@ void setup()
         audio_state = default_null;
     }
 
-    // randomShape(randNumber);
     col1.begin();
     col2.begin();
     col3.begin();
@@ -243,15 +233,10 @@ void loop()
     colPL.setBrightness(10);
     colPR.setBrightness(10);
 
-    // shapeI();
     if (!isGameStarted)
     {
         initGame();
         currentStateStart = digitalRead(BUTTON_START);
-        if (!audio.isPlaying(0))
-        {
-            audio_state = menu;
-        }
         if (currentStateStart == LOW)
         {
             startGame();
@@ -260,14 +245,11 @@ void loop()
     }
     else
     {
-        if (!audio.isPlaying(0))
+        if (!audio.isPlaying())
         {
             audio_state = background;
         }
         isGameOver = false;
-
-        SpeedUp = digitalRead(BUTTON_SPEEDUP);
-        updateSpeed();
 
         randomShape(randNumber);
     }
@@ -381,7 +363,6 @@ void startGame()
     showCol();
     showNextTileCol();
 
-    // randomSeed(analogRead(0));
     generateNumber();
 
     for (int i = 0; i < 38; i++)
@@ -392,7 +373,6 @@ void startGame()
         }
     }
     score = 0;
-    // randomShape(randNumber);
     isGameStarted = true;
 }
 
@@ -464,6 +444,7 @@ void displayNextTile()
 
 void updateSpeed()
 {
+    SpeedUp = digitalRead(BUTTON_SPEEDUP);
     // Change Speed
     if (SpeedUp == LOW)
     {
@@ -642,28 +623,14 @@ void shapeO()
         }
     }
     // Change Speed (Called in the void loop)
-    // if (SpeedUp == LOW)
-    // {
-    //     if (DelayVal - 300 > 0)
-    //     {
-    //         delay(DelayVal - 300);
-    //     }
-    //     else
-    //     {
-    //         delay(DelayVal);
-    //     }
-    // }
-    // else
-    // {
-    //     delay(DelayVal);
-    // }
+    updateSpeed();
+
     if (currentStateDrop == LOW)
     {
         turnoffO(centerx);
         while ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
         {
             centerx = centerx + SPEED;
-            // showCol();
         }
 
         lightArray[centerx][17 - centery2] = 3;
@@ -680,8 +647,6 @@ void shapeO()
 
         showCol();
         generateNumber();
-        // randNumber = randNumberNext;
-        // randNumberNext = random(0, 5);
     }
 
     else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -709,8 +674,6 @@ void shapeO()
 
         showCol();
         generateNumber();
-        // randNumber = randNumberNext;
-        // randNumberNext = random(0, 5);
     }
 }
 
@@ -728,7 +691,7 @@ void shapeL()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE); //记录是否按下rotate button
-    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
+
     currentStateDrop = digitalRead(BUTTON_DROP);
     // need to add more conditions 不同形态的
     if (currentL == 0)
@@ -902,21 +865,8 @@ void shapeL()
         }
     }
     // Change Speed (called in void loop)
-    // if (SpeedUp == LOW)
-    // {
-    //     if (DelayVal - 300 > 0)
-    //     {
-    //         delay(DelayVal - 300);
-    //     }
-    //     else
-    //     {
-    //         delay(DelayVal);
-    //     }
-    // }
-    // else
-    // {
-    //     delay(DelayVal);
-    // }
+    updateSpeed();
+
     // Drop
     // need to add more conditions 不同形态
     // 0
@@ -928,7 +878,6 @@ void shapeL()
             while ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3] == 0))
             {
                 centerx = centerx + SPEED;
-                // showCol();
             }
             lightArray[centerx][17 - centery3] = 1;
             lightArray[centerx + 2][17 - centery3] = 1;
@@ -944,8 +893,7 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
+
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery3] == 0))
@@ -970,8 +918,6 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -999,8 +945,6 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1025,8 +969,6 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -1053,8 +995,6 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + SPEED][17 - centery3] == 0) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0))
@@ -1079,8 +1019,6 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -1107,8 +1045,6 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentL = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1133,8 +1069,6 @@ void shapeL()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentL = 0;
         }
     }
@@ -1154,7 +1088,6 @@ void shapeZ()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE);
-    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
     currentStateDrop = digitalRead(BUTTON_DROP);
 
     if (currentZ == 0)
@@ -1242,21 +1175,8 @@ void shapeZ()
         }
     }
 
-    // if (SpeedUp == LOW)
-    // {
-    //     if (DelayVal - 300 > 0)
-    //     {
-    //         delay(DelayVal - 300);
-    //     }
-    //     else
-    //     {
-    //         delay(DelayVal);
-    //     }
-    // }
-    // else
-    // {
-    //     delay(DelayVal);
-    // }
+    updateSpeed();
+
     if (currentZ == 0)
     {
         if (currentStateDrop == LOW)
@@ -1280,8 +1200,6 @@ void shapeZ()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentZ = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1309,8 +1227,6 @@ void shapeZ()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentZ = 0;
         }
     }
@@ -1336,8 +1252,6 @@ void shapeZ()
             checkLine();
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentZ = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1365,8 +1279,6 @@ void shapeZ()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentZ = 0;
         }
     }
@@ -1385,7 +1297,6 @@ void shapeT()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE);
-    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
     currentStateDrop = digitalRead(BUTTON_DROP);
 
     if (currentT == 0)
@@ -1526,21 +1437,8 @@ void shapeT()
     }
 
     // Change Speed
-    // if (SpeedUp == LOW)
-    // {
-    //     if (DelayVal - 300 > 0)
-    //     {
-    //         delay(DelayVal - 300);
-    //     }
-    //     else
-    //     {
-    //         delay(DelayVal);
-    //     }
-    // }
-    // else
-    // {
-    //     delay(DelayVal);
-    // }
+    updateSpeed();
+
     if (currentT == 0)
     {
         if (currentStateDrop == LOW)
@@ -1564,8 +1462,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0))
@@ -1589,8 +1485,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1617,8 +1511,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery4] == 0))
@@ -1642,8 +1534,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1670,8 +1560,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 6) && (lightArray[centerx + 4 + SPEED][17 - centery3] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery2] == 0))
@@ -1695,8 +1583,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1723,8 +1609,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
         else if ((centerx < NUMPIXELS - 4) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + 2 + SPEED][17 - centery3] == 0) && (lightArray[centerx + SPEED][17 - centery4] == 0))
@@ -1748,8 +1632,6 @@ void shapeT()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentT = 0;
         }
     }
@@ -1769,7 +1651,6 @@ void shapeI()
     currentStateL = digitalRead(BUTTON_LEFT);
     currentStateR = digitalRead(BUTTON_RIGHT);
     currentRotateState = digitalRead(BUTTON_ROTATE);
-    // SpeedUp = digitalRead(BUTTON_SPEEDUP);
     currentStateDrop = digitalRead(BUTTON_DROP);
 
     if (currentI == 0)
@@ -1854,21 +1735,7 @@ void shapeI()
     }
 
     // Change Speed
-    // if (SpeedUp == LOW)
-    // {
-    //     if (DelayVal - 300 > 0)
-    //     {
-    //         delay(DelayVal - 300);
-    //     }
-    //     else
-    //     {
-    //         delay(DelayVal);
-    //     }
-    // }
-    // else
-    // {
-    //     delay(DelayVal);
-    // }
+    updateSpeed();
 
     if (currentI == 0)
     {
@@ -1893,8 +1760,6 @@ void shapeI()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentI = 0;
         }
         else if ((centerx < NUMPIXELS - 8) && (lightArray[centerx + 6 + SPEED][17 - centery3] == 0))
@@ -1922,8 +1787,6 @@ void shapeI()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
             currentI = 0;
         }
     }
@@ -1950,8 +1813,7 @@ void shapeI()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
+
             currentI = 0;
         }
         else if ((centerx < NUMPIXELS) && (lightArray[centerx + SPEED][17 - centery1] == 0) && (lightArray[centerx + SPEED][17 - centery2] == 0) && (lightArray[centerx + SPEED][17 - centery3] == 0) && (lightArray[centerx + SPEED][17 - centery4] == 0))
@@ -1979,8 +1841,7 @@ void shapeI()
 
             showCol();
             generateNumber();
-            // randNumber = randNumberNext;
-            // randNumberNext = random(0, 5);
+
             currentI = 0;
         }
     }
@@ -2032,10 +1893,8 @@ void checkLine()
                 playAudioOnce = true;
             }
 
-            // delay(10);
-            // blink(i);
             arrayUpdate(i);
-            // blink(i);
+
             i = i + 2;
         }
     }
@@ -3166,10 +3025,10 @@ void turnoffI(int centerx)
 
             break;
         case PIN_RIGHT3 - 2:
-            colR2.setPixelColor(centerx, Colors::BLACK);
-            colR2.setPixelColor(centerx + 2, Colors::BLACK);
-            colR2.setPixelColor(centerx + 4, Colors::BLACK);
-            colR2.setPixelColor(centerx + 6, Colors::BLACK);
+            colR3.setPixelColor(centerx, Colors::BLACK);
+            colR3.setPixelColor(centerx + 2, Colors::BLACK);
+            colR3.setPixelColor(centerx + 4, Colors::BLACK);
+            colR3.setPixelColor(centerx + 6, Colors::BLACK);
 
             break;
         }
@@ -4222,20 +4081,21 @@ void audioControl()
     switch (audio_state)
     {
     case add_point:
-        strcpy_P(wavFile, wav_table[0]);
-        audio.play(wavFile, 1);
+        tone(buzzer, 1000);
+        delay(20);
+        noTone(buzzer);
+        delay(10);
+        tone(buzzer, 4500);
+        delay(100);
+        noTone(buzzer);
         break; // Play point sound on pins 5,2
     case game_over:
-        strcpy_P(wavFile, wav_table[1]);
-        audio.play(wavFile, 1);
+        strcpy_P(wavFile, wav_table[0]);
+        audio.play(wavFile);
         break; // Play gameover sound on pins 5,2
     case background:
-        strcpy_P(wavFile, wav_table[2]);
-        audio.play(wavFile, 0);
-        break; // Play background music on pins 6,7
-    case menu:
-        strcpy_P(wavFile, wav_table[3]);
-        audio.play(wavFile, 0);
+        strcpy_P(wavFile, wav_table[1]);
+        audio.play(wavFile);
         break; // Play background music on pins 6,7
     case increase:
         audio.volume(1);
@@ -4244,14 +4104,11 @@ void audioControl()
         audio.volume(0);
         break; // Decrease volume by 1
     case mute_bg:
-        audio.setVolume(0, 0);
+        audio.setVolume(0);
         break; // mute background on output 0
     case unmute_bg:
-        audio.setVolume(3, 0);
+        audio.setVolume(3);
         break; // Unmute background on output 0
-    case stop_sound:
-        audio.stopPlayback(1);
-        break; // Stop playback on output 0
     case stop_all:
         audio.stopPlayback();
         break; // Stop all playback
