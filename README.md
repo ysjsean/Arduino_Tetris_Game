@@ -23,7 +23,7 @@
 ## Meet the team:
 
 1. **Project Lead**
-   - Shawn Koh
+   - Shawn Koh Jun Jie
 2. **Hardware team**
    - Tan Khai Ming
    - Teo Kai Xin, Hazel
